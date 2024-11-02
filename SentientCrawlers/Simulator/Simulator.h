@@ -17,7 +17,7 @@ protected:
 	std::vector<Crawler> crawlers;
 
 	std::pair<double, double> ClosestBar(const Crawler& crawler);
-    double DistanceToRiver(const Crawler& crawler);
+    std::pair<double, double> ClosestRiverPoint(const Crawler& crawler);
     int MinutesSpentAtBar(const Crawler& crawler);
     std::pair<double, double> ClosestBridge(const Crawler& crawler);
 };

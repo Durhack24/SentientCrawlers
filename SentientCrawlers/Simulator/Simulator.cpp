@@ -25,7 +25,7 @@ static double Distance(double x, double y, const Point& p)
 	return std::hypot(dx, dy);
 }
 
-static double Distance(double x, double y, const Point& p0, const Point& p1)
+static Point ClosestPointOnLine(double x, double y, const Point& p0, const Point& p1)
 {
 	double w = p1.x - p0.x;
 	double h = p1.y - p0.y;
@@ -35,13 +35,13 @@ static double Distance(double x, double y, const Point& p0, const Point& p1)
 	double t = (dx * w + dy * h) / (w * w + h * h);
 
 	if (t <= 0)
-		return Distance(x, y, p0);
+		return p0;
 	if (t >= 1)
-		return Distance(x, y, p1);
+		return p1;
 
 	double nearX = p0.x + w * t;
 	double nearY = p0.y + h * t;
-	return std::hypot(x - nearX, y - nearY);
+	return Point{ nearX, nearY };
 }
 
 void Simulator::Step(size_t num)
@@ -82,16 +82,23 @@ std::pair<double, double> Simulator::ClosestBar(const Crawler& crawler)
 	return { closestDistance, NormalizeAngle(absDirection) };
 }
 
-double Simulator::DistanceToRiver(const Crawler& crawler)
+std::pair<double, double> Simulator::ClosestRiverPoint(const Crawler& crawler)
 {
+    const Point* closestPoint = nullptr;
     double closestDistance = INFINITY;
     const auto& river = Map::GetRiver();
     for (size_t i = 0; i < river.size() - 1; ++i)
     {
-        double distance = Distance(crawler.xPos, crawler.yPos, river[i], river[i + 1]);
-        closestDistance = std::min(closestDistance, distance);
+        Point point = ClosestPointOnLine(crawler.xPos, crawler.yPos, river[i], river[i + 1]);
+        double distance = Distance(crawler.xPos, crawler.yPos, point);
+        if (distance < closestDistance)
+        {
+            closestPoint = &point;
+            closestDistance = distance;
+        }
     }
-    return closestDistance;
+    double absDirection = atan2(closestPoint->y - crawler.yPos, closestPoint->x - crawler.xPos) - crawler.dir;
+    return { closestDistance, NormalizeAngle(absDirection) };
 }
 
 int Simulator::MinutesSpentAtBar(const Crawler& crawler)
