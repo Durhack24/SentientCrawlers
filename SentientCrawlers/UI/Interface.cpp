@@ -57,6 +57,8 @@ void Interface::Render()
             else if (simState == SimulatorState::Idle)
                 simState = SimulatorState::RunningAtMax;
 
+        ImGui::Text("Max Bars: %d", maxBarsVisited);
+
         // Graph
         ImGui::BeginChild("graph", { 0, 200 }, ImGuiChildFlags_Border);
         ImGui::EndChild();
@@ -94,9 +96,15 @@ void Interface::Render()
         {
             const auto& crawlers = sim->GetCrawlers();
             for (const auto& crawler : crawlers)
-                draw->AddCircleFilled(PointToScreen(pos, size, crawler.pos), 5.0f, IM_COL32(255, 255, 0, 255));
+            {
+                int numVisited = crawler.numVisitedBars;
+                if (numVisited > maxBarsVisited)
+                    maxBarsVisited = numVisited;
+
+                float col = (float)numVisited / 16 * 255.0f;
+                draw->AddCircleFilled(PointToScreen(pos, size, crawler.pos), 5.0f, IM_COL32(col, col, col, 255));
+            }
         }
-        
 
         ImGui::EndChild();
     }
