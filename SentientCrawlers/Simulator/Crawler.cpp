@@ -73,7 +73,7 @@ void Crawler::Reset(Point pos_, double dir_)
     numBeatings = 0;
 }
 
-int Crawler::GetBarMinutes()
+int Crawler::GetBarMinutes() const
 {
 	return minutesAtBar;
 }
@@ -84,4 +84,4 @@ double Crawler::GetAverageIntoxication() const
 }
 
 Crawler::Crawler(const Brain& brain_, Point pos_, double dir_)
-    : brain(brain_), pos(pos_), dir(dir_) {}
+    : pos(pos_), dir(dir_), brain(brain_) {}

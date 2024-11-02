@@ -24,7 +24,7 @@ public:
 
     void Step(const std::vector<double>& stimuli, std::optional<uint32_t> barIdx);
 	void Reset(Point pos_, double dir_);
-	int GetBarMinutes();
+	int GetBarMinutes() const;
     double GetAverageIntoxication() const;
 
 protected:

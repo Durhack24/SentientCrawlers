@@ -13,5 +13,5 @@ protected:
 	Simulator& sim;
 	Point mapSize;
 
-	ImVec2 PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p);
+	ImVec2 PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p) const;
 };

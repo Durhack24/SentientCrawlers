@@ -15,7 +15,7 @@ public:
 	void NextGeneration();
 
 	std::vector<Crawler> GetCrawlers();
-	static void StepCrawler(const Crawler& crawler);
+	static void StepCrawler(Crawler& crawler);
 
 protected:
 	std::mutex bufMutex;

@@ -84,7 +84,7 @@ std::vector<Crawler> Simulator::GetCrawlers()
     return crawlersBuf;
 }
 
-void Simulator::StepCrawler(const Crawler& crawler)
+void Simulator::StepCrawler(Crawler& crawler)
 {
     // Determine stimuli
     auto [barDistance, barDir] = ClosestBar(crawler);
@@ -164,7 +164,7 @@ std::pair<double, double> Simulator::ClosestBridge(const Crawler& crawler)
 {
     const Point* closestBridge = nullptr;
     double closestDistance = INFINITY;
-    for (auto& bridge : Map::GetBridges())
+    for (const auto& bridge : Map::GetBridges())
     {
         double distance = Distance(crawler.pos, bridge);
         if (distance < closestDistance)
