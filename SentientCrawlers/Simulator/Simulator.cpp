@@ -61,7 +61,7 @@ void Simulator::Step(size_t num)
 
 static double Cost(const Crawler& c)
 {
-    return c.numVisitedBars + c.GetAverageIntoxication() - c.numBeatings;
+    return c.numVisitedBars + c.GetAverageIntoxication() * 10 - c.numBeatings;
 }
 
 void Simulator::NextGeneration()
@@ -91,8 +91,14 @@ void Simulator::StepCrawler(Crawler& crawler)
     double minutesAtBar = MinutesSpentAtBar(crawler);
     auto [riverDistance, riverDir] = ClosestRiverPoint(crawler);
     auto [bridgeDistance, bridgeDir] = ClosestBridge(crawler);
-    std::vector<double> stimuli{ barDistance, barDir, minutesAtBar,
-        riverDistance, riverDir, bridgeDistance, bridgeDir };
+    std::vector<double> stimuli{
+        barDistance / 250,
+        barDir,
+        minutesAtBar * 0,
+        riverDistance * 0,
+        riverDir * 0,
+        bridgeDistance * 0,
+        bridgeDir * 0 };
 
     // Get current bar
     auto currentBarIdx = GetCurrentBar(crawler);

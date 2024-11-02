@@ -23,7 +23,7 @@ void Crawler::Step(const std::vector<double>& stimuli, std::optional<uint32_t> b
 
     // Update turn direction
     double turnDel = thought[0] - thought[1];
-    dir += turnDel * 2;
+    dir += turnDel * 6.28;
 
     // Move forward
     double speed = thought[2] * 30;
