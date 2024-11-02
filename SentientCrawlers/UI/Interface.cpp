@@ -1,5 +1,6 @@
 #include "Interface.h"
 
+#include <iostream>
 #include <format>
 
 #include "../ImGui/imgui.h"
@@ -7,36 +8,103 @@
 #include "../ImGui/imgui_impl_opengl3.h"
 
 Interface::Interface()
-    : open(true) {}
+    : open(true), simThread([this]() { this->SimulatorThread(); })
+{
+}
+
+Interface::~Interface()
+{
+    simState = SimulatorState::Idle;
+    open = false;
+    simThread.join();
+}
 
 void Interface::Render()
 {
     ImGuiStyle& style = ImGui::GetStyle();
-    //style.ItemSpacing = { 0.0f, 0.0f };
 
-    // Demo window
     if (ImGui::Begin("Layout", &open, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
     {
+        // === Sidebar ===
         ImGui::SetNextWindowSizeConstraints({ 100, -1 }, { 600, -1 });
-        ImGui::BeginChild("child1", { 200, 0 }, ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX);
+        ImGui::BeginChild("sidebar", { 200, 0 }, ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX);
+
+        // Configuration
+        ImGui::Text("Configuration");
+        static int numCrawlers = 100;
+        ImGui::InputInt("Num Crawlers", &numCrawlers);
+        if (ImGui::Button("Create Simulation"))
+            sim = std::make_unique<Simulator>(numCrawlers);
+
+        ImGui::Separator();
+
+        // Options
+        if (!sim)
+            ImGui::BeginDisabled();
+
+        ImGui::InputInt("Crawl Duration", &crawlDuration);
+        if (ImGui::Button("One Generation") && simState == SimulatorState::Idle)
+            simState = SimulatorState::RunningOneGen;
+        if (ImGui::Button("Run at Max"))
+            if (simState == SimulatorState::RunningAtMax)
+                simState = SimulatorState::Idle;
+            else if (simState == SimulatorState::Idle)
+                simState = SimulatorState::RunningAtMax;
+
+        // Graph
+        ImGui::BeginChild("graph", { 0, 200 }, ImGuiChildFlags_Border);
         ImGui::EndChild();
 
+        if (!sim)
+            ImGui::EndDisabled();
+
+        ImGui::EndChild();
+
+        // === Canvas ===
         ImGui::SameLine();
-        
-        ImGui::BeginChild("child2", { -30, 0});
+        ImGui::BeginChild("canvas");
         ImVec2 size = ImGui::GetContentRegionAvail();
         ImVec2 pos = ImGui::GetCursorScreenPos();
 
         ImDrawList* draw = ImGui::GetWindowDrawList();
         draw->AddRectFilled(pos, pos + size, IM_COL32(255, 0, 0, 255), 0);
         ImGui::EndChild();
-
-        ImGui::SameLine();
-
-        ImGui::BeginChild("child3");
-        ImGui::EndChild();
     }
     ImGui::End();
+}
 
-    ImGui::ShowDemoWindow();
+void Interface::SimulatorThread()
+{
+    while (open)
+    {
+        switch (simState)
+        {
+        case SimulatorState::Idle:
+            break;
+        case SimulatorState::RunningOneGen:
+            RunOneGen();
+            simState = SimulatorState::Idle;
+            break;
+        case SimulatorState::RunningAtMax:
+            RunAtMax();
+            break;
+        }
+    }
+}
+
+void Interface::RunOneGen()
+{
+    sim->Step(crawlDuration);
+    sim->NextGeneration();
+}
+
+void Interface::RunAtMax()
+{
+    static size_t counter = 0;
+    while (simState == SimulatorState::RunningAtMax)
+    {
+        sim->Step(crawlDuration);
+        sim->NextGeneration();
+        std::cout << std::format("Generation: {}\n", counter++);
+    }
 }
