@@ -4,7 +4,7 @@
 #include "Resources/ResourceManager.h"
 #include "Simulator/Map.h"
 
-int main(int argc, char** argv)
+int main(int, char** argv)
 {
 #if 1
     // Find resources

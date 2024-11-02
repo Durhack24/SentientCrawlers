@@ -171,7 +171,7 @@ std::pair<double, double> Simulator::ClosestBridge(const Crawler& crawler)
 {
     const Point* closestBridge = nullptr;
     double closestDistance = INFINITY;
-    for (auto& bridge : Map::GetBridges())
+    for (const auto& bridge : Map::GetBridges())
     {
         double distance = Distance(crawler.pos, bridge);
         if (distance < closestDistance)
