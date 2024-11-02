@@ -11,7 +11,7 @@ void Map::Load()
 {
     bars = CSVReader::ParseBars(ResourceManager::GetResourcePath("bars.csv"));
     river = CSVReader::ParsePoints(ResourceManager::GetResourcePath("river.csv"));
-    bridges = CSVReader::ParsePoints(ResourceManager::GetResourcePath("bridges.csv"))
+    bridges = CSVReader::ParsePoints(ResourceManager::GetResourcePath("bridges.csv"));
 }
 
 const std::vector<CollegeBar>& Map::GetBars()

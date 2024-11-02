@@ -3,6 +3,8 @@
 #include <iostream>
 #include <format>
 
+#include "../Resources/ResourceManager.h"
+
 #include "../ImGui/imgui.h"
 #include "../ImGui/imgui_impl_glfw.h"
 #include "../ImGui/imgui_impl_opengl3.h"
@@ -10,6 +12,7 @@
 Interface::Interface()
     : open(true), simThread([this]() { this->SimulatorThread(); })
 {
+    mapImg = std::make_unique<Image>(ResourceManager::GetResourcePath("map.png"));
 }
 
 Interface::~Interface()
@@ -30,11 +33,11 @@ void Interface::Render()
         ImGui::BeginChild("sidebar", { 200, 0 }, ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX);
 
         // Configuration
-        ImGui::Text("Configuration");
         static int numCrawlers = 100;
+        ImGui::Text("Configuration");
         ImGui::InputInt("Num Crawlers", &numCrawlers);
         if (ImGui::Button("Create Simulation"))
-            sim = std::make_unique<Simulator>(numCrawlers);
+            sim = std::make_unique<Simulator>(numCrawlers, Point{ 600, 973 });
 
         ImGui::Separator();
 
@@ -67,7 +70,7 @@ void Interface::Render()
         ImVec2 pos = ImGui::GetCursorScreenPos();
 
         ImDrawList* draw = ImGui::GetWindowDrawList();
-        draw->AddRectFilled(pos, pos + size, IM_COL32(255, 0, 0, 255), 0);
+        draw->AddImage((ImTextureID)(intptr_t)mapImg->Id(), pos, pos + size);
         ImGui::EndChild();
     }
     ImGui::End();

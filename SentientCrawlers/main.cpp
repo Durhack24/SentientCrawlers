@@ -2,22 +2,26 @@
 
 #include "UI/App.h"
 #include "Resources/ResourceManager.h"
-
-#include "Simulator/Brain.h"
-
 #include "Simulator/Map.h"
 
 int main(int argc, char** argv)
 {
-#if 0
+#if 1
     // Find resources
     ResourceManager::AddSearchPath(argv[0]);
     ResourceManager::FindResources();
 
+    // Load map
+    Map::Load();
+
     // Initialize
     App app;
     bool initSuccess = app.Initialize();
-    if (!initSuccess) return 1;
+    if (!initSuccess)
+    {
+        std::cerr << "app.Initialize() Failed!\n";
+        std::terminate();
+    }
 
     char* versionStr = (char*)glGetString(GL_VERSION);
     std::cout << "OpenGL Version: " << versionStr;
@@ -25,15 +29,6 @@ int main(int argc, char** argv)
     // Main loop
     app.MainLoop();
 #else
-    ResourceManager::AddSearchPath(argv[0]);
-    ResourceManager::FindResources();
 
-    Brain b = Brain::Random();
-
-    std::vector<double> stimuli{ 1, 2, 3, 4, 5, 6 };
-    auto res = b.Think(stimuli);
-
-    Map::Load();
-    auto river = Map::GetBars();
 #endif
 }

@@ -2,6 +2,7 @@
 #include <thread>
 #include <memory>
 
+#include "Image.h"
 #include "../Simulator/Simulator.h"
 
 enum class SimulatorState
@@ -21,6 +22,8 @@ public:
 
 protected:
 	bool open = true;
+	std::unique_ptr<Image> mapImg;
+
 	int crawlDuration = 300;
 	std::unique_ptr<Simulator> sim;
 	SimulatorState simState = SimulatorState::Idle;

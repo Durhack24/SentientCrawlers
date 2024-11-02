@@ -1,8 +1,10 @@
 #pragma once
-#define GL_SILENCE_DEPRECATION
-#include <GLFW/glfw3.h>
+#include <memory>
 
 #include "Interface.h"
+
+#define GL_SILENCE_DEPRECATION
+#include <GLFW/glfw3.h>
 
 class App
 {
@@ -18,6 +20,6 @@ protected:
 	static void RenderImgui();
 
 	GLFWwindow* window;
-	Interface interface {};
+	std::unique_ptr<Interface> interface;
 	int w, h;
 };

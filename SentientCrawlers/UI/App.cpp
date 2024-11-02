@@ -20,7 +20,16 @@ bool App::Initialize()
 
     // Initialize ImGui
     bool imGuiInitSuccess = InitializeImGui(window);
-    return imGuiInitSuccess;
+    if (!imGuiInitSuccess) return false;
+
+    // Initialize Glew
+    bool glewInitSuccess = (glewInit() == GLEW_OK);
+    if (!glewInitSuccess) return false;
+
+    // Create interface
+    interface = std::make_unique<Interface>();
+
+    return true;
 }
 
 void App::MainLoop()
@@ -39,7 +48,7 @@ void App::MainLoop()
         ImGui::SetNextWindowSize(viewport->Size);
 
         // Render interface
-        interface.Render();
+        interface->Render();
 
         // Rendering
         UpdateViewport();
