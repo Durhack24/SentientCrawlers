@@ -4,18 +4,11 @@
 
 Brain Brain::Random()
 {
-    std::vector<double> inputs;
-    std::vector<double> layer0;
-    std::vector<double> layer1;
-
-    InitializeLayer(inputs, (NumInputs + 1) * NumHidden0);
-    InitializeLayer(inputs, (NumHidden0 + 1) * NumHidden1);
-    InitializeLayer(inputs, (NumHidden1 + 1) * NumOutputs);
-
     Brain brain;
-    brain.weights[0] = inputs;
-    brain.weights[1] = layer0;
-    brain.weights[2] = layer1;
+    InitializeLayer(brain.weights[0], (NumInputs + 1) * NumHidden0);
+    InitializeLayer(brain.weights[1], (NumHidden0 + 1) * NumHidden1);
+    InitializeLayer(brain.weights[2], (NumHidden1 + 1) * NumOutputs);
+
 	return brain;
 }
 
@@ -28,12 +21,16 @@ Brain Brain::Mutate(const Brain& parent)
 	return mutated;
 }
 
-std::vector<double> Brain::Think(const std::vector<double>& stimuli)
+Brain::Layer Brain::Think(const Layer& stimuli)
 {
-	return std::vector<double>();
+    auto h0 = ApplyLayer(stimuli, weights[0]);
+    auto h1 = ApplyLayer(h0, weights[1]);
+    auto output = ApplyLayer(h1, weights[2]);
+
+    return output;
 }
 
-void Brain::InitializeLayer(std::vector<double>& layer, size_t size)
+void Brain::InitializeLayer(Layer& layer, size_t size)
 {
     static std::mt19937_64 gen{ std::random_device{}() };
     static std::uniform_real_distribution<double> dist{ -1, 1 };
@@ -43,7 +40,7 @@ void Brain::InitializeLayer(std::vector<double>& layer, size_t size)
         layer.push_back(dist(gen));
 }
 
-void Brain::MutateLayer(std::vector<double>& layer)
+void Brain::MutateLayer(Layer& layer)
 {
     static std::mt19937_64 gen{ std::random_device{}() };
     static std::uniform_real_distribution<double> dist{-1, 1 };
@@ -62,4 +59,29 @@ void Brain::MutateLayer(std::vector<double>& layer)
         }
         layer[i] += dist(gen) * 0.05;
     }
+}
+
+static inline double sigmoid(double x)
+{
+    return 1.0 / (1.0 + exp(-x));
+}
+
+Brain::Layer Brain::ApplyLayer(const Layer& nodes, const Layer& layer)
+{
+    size_t weightWidth = nodes.size() + 1;
+    size_t weightHeight = layer.size() / weightWidth;
+
+    Layer ret(weightHeight);
+    for (size_t outIdx = 0; outIdx < weightHeight; outIdx++)
+    {
+        double nodeValue = layer[weightWidth * outIdx]; // Start with the bias (weight in the first column)
+
+        // Sum the weights multiplied by node values
+        for (size_t inputIdx = 0; inputIdx < weightWidth - 1; inputIdx++)
+            nodeValue += nodes[inputIdx] * layer[weightWidth * outIdx + inputIdx + 1];
+
+        ret[outIdx] = sigmoid(nodeValue);
+    }
+
+    return ret;
 }

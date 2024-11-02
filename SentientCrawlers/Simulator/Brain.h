@@ -16,11 +16,12 @@ public:
 	static Brain Random();
 	static Brain Mutate(const Brain& parent);
 
-	std::vector<double> Think(const std::vector<double>& stimuli);
+	Layer Think(const Layer& stimuli);
 
 protected:
 	std::array<Layer, 3> weights;
 
-    static void InitializeLayer(std::vector<double>& layer, size_t size);
-    static void MutateLayer(std::vector<double>& layer);
+    static void InitializeLayer(Layer& layer, size_t size);
+    static void MutateLayer(Layer& layer);
+	static Layer ApplyLayer(const Layer& nodes, const Layer& layer);
 };
