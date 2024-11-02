@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+
 #include "Brain.h"
 #include "Point.h"
 

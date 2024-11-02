@@ -38,7 +38,10 @@ void Interface::Render()
         ImGui::Text("Configuration");
         ImGui::InputInt("Num Crawlers", &numCrawlers);
         if (ImGui::Button("Create Simulation"))
+        {
             sim = std::make_unique<Simulator>(numCrawlers, Point{ 620, 1030 - 950 });
+            renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
+        }
 
         ImGui::Separator();
 
@@ -57,6 +60,16 @@ void Interface::Render()
             else if (simState == SimulatorState::Idle)
                 simState = SimulatorState::RunningAtMax;
 
+        static bool showBestCrawler = false;
+        if (ImGui::Checkbox("Show Best Crawler", &showBestCrawler))
+        {
+            renderer.reset();
+            if (showBestCrawler)
+                renderer = std::make_unique<ShowcaseRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
+            else
+                renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
+        }
+
         ImGui::Text("Max Bars: %d", maxBarsVisited);
 
         // Graph
@@ -71,43 +84,18 @@ void Interface::Render()
         // === Canvas ===
         ImGui::SameLine();
         ImGui::BeginChild("canvas");
-        ImVec2 size = ImGui::GetContentRegionAvail();
-        ImVec2 pos = ImGui::GetCursorScreenPos();
 
+        // Useful variables
         ImDrawList* draw = ImGui::GetWindowDrawList();
-        draw->AddImage((ImTextureID)(intptr_t)mapImg->Id(), pos, pos + size);
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImVec2 size = ImGui::GetContentRegionAvail();
+        
+        // Render the map, the river, and the bars
+        RenderBackdrop(draw, pos, size);
 
-        // Draw the river
-        const auto& river = Map::GetRiver();
-        for (size_t i = 0; i < river.size() - 1; i++)
-        {
-            Point p0 = river[i];
-            Point p1 = river[i + 1];
-            draw->AddLine(PointToScreen(pos, size, p0), PointToScreen(pos, size, p1), IM_COL32(0, 255, 255, 255), 10.0f);
-        }
-
-        // Draw the bars
-        const auto& bars = Map::GetBars();
-        for (const auto& bar : bars)
-        {
-            draw->AddEllipseFilled(PointToScreen(pos, size, bar.pos), 16.0f / mapImg->Width() * size.x,
-                16.0f / mapImg->Height() * size.y, IM_COL32(255, 0, 0, 255));
-        }
-
-        // Draw the crawler
-        if (sim)
-        {
-            auto crawlers = sim->GetCrawlers();
-            for (const auto& crawler : crawlers)
-            {
-                int numVisited = crawler.numVisitedBars;
-                if (numVisited > maxBarsVisited)
-                    maxBarsVisited = numVisited;
-
-                float col = ((crawler.numBeatings) * 255.0f);
-                draw->AddCircleFilled(PointToScreen(pos, size, crawler.pos), 5.0f, IM_COL32(col, col, col, 255));
-            }
-        }
+        // Render crawlers
+        if (renderer)
+            renderer->Render(draw, pos, size);
 
         ImGui::EndChild();
     }
@@ -120,6 +108,29 @@ ImVec2 Interface::PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p)
     float screenY = (1.0 - p.y / mapImg->Height()) * canvasSize.y + canvasPos.y;
 
     return { screenX, screenY };
+}
+
+void Interface::RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size)
+{
+    // Draw the map
+    draw->AddImage((ImTextureID)(intptr_t)mapImg->Id(), pos, pos + size);
+
+    // Draw the river
+    const auto& river = Map::GetRiver();
+    for (size_t i = 0; i < river.size() - 1; i++)
+    {
+        Point p0 = river[i];
+        Point p1 = river[i + 1];
+        draw->AddLine(PointToScreen(pos, size, p0), PointToScreen(pos, size, p1), IM_COL32(0, 255, 255, 255), 10.0f);
+    }
+
+    // Draw the bars
+    const auto& bars = Map::GetBars();
+    for (const auto& bar : bars)
+    {
+        draw->AddEllipseFilled(PointToScreen(pos, size, bar.pos), 16.0f / mapImg->Width() * size.x,
+            16.0f / mapImg->Height() * size.y, IM_COL32(255, 0, 0, 255));
+    }
 }
 
 void Interface::SimulatorThread()
