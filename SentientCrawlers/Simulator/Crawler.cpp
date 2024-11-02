@@ -6,6 +6,12 @@ Crawler::Crawler(double xPos_, double yPos_, double dir_)
 
 }
 
+void Crawler::Step(const std::vector<double>& stimuli)
+{
+
+}
+
+
 void Crawler::Reset(double xPos_, double yPos_, double dir_)
 {
 	xPos = xPos_;
