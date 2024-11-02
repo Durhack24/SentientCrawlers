@@ -10,6 +10,8 @@ Simulator::Simulator(size_t numCrawlers, const Point& startPos)
     crawlers.reserve(numCrawlers);
     for (size_t i = 0; i < numCrawlers; ++i)
         crawlers.emplace_back(startPos.x, startPos.y, 0.0);
+
+    crawlersBuf = crawlers;
 }
 
 static inline double NormalizeAngle(double angle)
@@ -62,11 +64,18 @@ void Simulator::Step(size_t num)
 			crawler.Step(stimuli, barDistance < 16, barIdx);
 		}
 	}
+
+    crawlersBuf = crawlers;
 }
 
 void Simulator::NextGeneration()
 {
 
+}
+
+const std::vector<Crawler>& Simulator::GetCrawlers() const
+{
+    return crawlersBuf;
 }
 
 std::tuple<uint32_t, double, double> Simulator::ClosestBar(const Crawler& crawler)

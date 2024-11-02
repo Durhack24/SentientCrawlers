@@ -19,7 +19,7 @@ Interface::Interface()
 Interface::~Interface()
 {
     simState = SimulatorState::Idle;
-    open = false;
+    runSimThread = false;
     simThread.join();
 }
 
@@ -84,6 +84,20 @@ void Interface::Render()
             draw->AddLine(PointToScreen(pos, size, p0), PointToScreen(pos, size, p1), IM_COL32(0, 255, 255, 255), 10.0f);
         }
 
+        // Draw the bars
+        const auto& bars = Map::GetBars();
+        for (const auto& bar : bars)
+            draw->AddCircleFilled(PointToScreen(pos, size, bar.pos), 16.0f, IM_COL32(255, 0, 0, 255));
+
+        // Draw the crawler
+        if (sim)
+        {
+            const auto& crawlers = sim->GetCrawlers();
+            for (const auto& crawler : crawlers)
+                draw->AddCircleFilled(PointToScreen(pos, size, Point{ crawler.xPos, crawler.yPos }), 5.0f, IM_COL32(255, 255, 0, 255));
+        }
+        
+
         ImGui::EndChild();
     }
     ImGui::End();
@@ -99,7 +113,7 @@ ImVec2 Interface::PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p)
 
 void Interface::SimulatorThread()
 {
-    while (open)
+    while (runSimThread)
     {
         switch (simState)
         {

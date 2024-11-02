@@ -25,11 +25,12 @@ public:
 
 protected:
 	bool open = true;
+	volatile bool runSimThread = true;
 	std::unique_ptr<Image> mapImg;
 
 	int crawlDuration = 300;
 	std::unique_ptr<Simulator> sim;
-	SimulatorState simState = SimulatorState::Idle;
+	volatile SimulatorState simState = SimulatorState::Idle;
 
 	ImVec2 PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p);
 
