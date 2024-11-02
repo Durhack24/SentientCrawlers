@@ -89,7 +89,7 @@ std::pair<double, double> Simulator::ClosestBar(const Crawler& crawler)
 
 std::pair<double, double> Simulator::ClosestRiverPoint(const Crawler& crawler)
 {
-    const Point* closestPoint = nullptr;
+    Point closestPoint;
     double closestDistance = INFINITY;
     const auto& river = Map::GetRiver();
     for (size_t i = 0; i < river.size() - 1; ++i)
@@ -98,11 +98,11 @@ std::pair<double, double> Simulator::ClosestRiverPoint(const Crawler& crawler)
         double distance = Distance(crawler.xPos, crawler.yPos, point);
         if (distance < closestDistance)
         {
-            closestPoint = &point;
+            closestPoint = point;
             closestDistance = distance;
         }
     }
-    double absDirection = atan2(closestPoint->y - crawler.yPos, closestPoint->x - crawler.xPos) - crawler.dir;
+    double absDirection = atan2(closestPoint.y - crawler.yPos, closestPoint.x - crawler.xPos) - crawler.dir;
     return { closestDistance, NormalizeAngle(absDirection) };
 }
 
@@ -113,18 +113,18 @@ int Simulator::MinutesSpentAtBar(const Crawler& crawler)
 
 std::pair<double, double> Simulator::ClosestBridge(const Crawler& crawler)
 {
-    const Point* closestBar = nullptr;
+    const Point* closestBridge = nullptr;
     double closestDistance = INFINITY;
-    for (auto& bar : Map::GetBridges())
+    for (auto& bridge : Map::GetBridges())
     {
-        double distance = Distance(crawler.xPos, crawler.yPos, bar);
+        double distance = Distance(crawler.xPos, crawler.yPos, bridge);
         if (distance < closestDistance)
         {
-            closestBar = &bar;
+            closestBridge = &bridge;
             closestDistance = distance;
         }
     }
 
-    double absDirection = atan2(closestBar->y - crawler.yPos, closestBar->x - crawler.xPos) - crawler.dir;
+    double absDirection = atan2(closestBridge->y - crawler.yPos, closestBridge->x - crawler.xPos) - crawler.dir;
     return { closestDistance, NormalizeAngle(absDirection) };
 }

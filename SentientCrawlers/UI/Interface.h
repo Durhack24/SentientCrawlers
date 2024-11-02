@@ -5,6 +5,8 @@
 #include "Image.h"
 #include "../Simulator/Simulator.h"
 
+#include "../ImGui/imgui.h"
+
 enum class SimulatorState
 {
 	Idle,
@@ -28,6 +30,8 @@ protected:
 	int crawlDuration = 300;
 	std::unique_ptr<Simulator> sim;
 	SimulatorState simState = SimulatorState::Idle;
+
+	ImVec2 PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p);
 
 	void SimulatorThread();
 	void RunOneMinute();

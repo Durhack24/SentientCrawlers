@@ -5,9 +5,10 @@
 
 #include "../Resources/ResourceManager.h"
 
-#include "../ImGui/imgui.h"
 #include "../ImGui/imgui_impl_glfw.h"
 #include "../ImGui/imgui_impl_opengl3.h"
+
+#include "../Simulator/Map.h"
 
 Interface::Interface()
     : open(true), simThread([this]() { this->SimulatorThread(); })
@@ -37,7 +38,7 @@ void Interface::Render()
         ImGui::Text("Configuration");
         ImGui::InputInt("Num Crawlers", &numCrawlers);
         if (ImGui::Button("Create Simulation"))
-            sim = std::make_unique<Simulator>(numCrawlers, Point{ 600, 973 });
+            sim = std::make_unique<Simulator>(numCrawlers, Point{ 620, 1030 - 950 });
 
         ImGui::Separator();
 
@@ -73,9 +74,27 @@ void Interface::Render()
 
         ImDrawList* draw = ImGui::GetWindowDrawList();
         draw->AddImage((ImTextureID)(intptr_t)mapImg->Id(), pos, pos + size);
+
+        // Draw the river
+        const auto& river = Map::GetRiver();
+        for (size_t i = 0; i < river.size() - 1; i++)
+        {
+            Point p0 = river[i];
+            Point p1 = river[i + 1];
+            draw->AddLine(PointToScreen(pos, size, p0), PointToScreen(pos, size, p1), IM_COL32(0, 255, 255, 255), 10.0f);
+        }
+
         ImGui::EndChild();
     }
     ImGui::End();
+}
+
+ImVec2 Interface::PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p)
+{
+    float screenX = (p.x / mapImg->Width()) * canvasSize.x + canvasPos.x;
+    float screenY = (1.0 - p.y / mapImg->Height()) * canvasSize.y + canvasPos.y;
+
+    return { screenX, screenY };
 }
 
 void Interface::SimulatorThread()
