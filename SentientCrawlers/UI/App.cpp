@@ -15,7 +15,7 @@ bool App::Initialize()
 
     // Create window with graphics context
     bool windowSuccess;
-    std::tie(window, windowSuccess) = CreateWindow(1280, 720, "ImGui Testing");
+    std::tie(window, windowSuccess) = CreateWindow(1280, 720, "Sentient Crawlers");
     if (!windowSuccess) return false;
 
     // Initialize ImGui
