@@ -1,6 +1,6 @@
 #pragma once
 
-struct RiverPoint
+struct Point
 {
 	int x, y;
 };

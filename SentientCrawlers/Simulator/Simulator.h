@@ -13,4 +13,7 @@ public:
 
 protected:
 	std::vector<Crawler> crawlers;
+
+	double ClosestBar(const Crawler& crawler);
+	double ClosestBarDir(const Crawler& crawler);
 };

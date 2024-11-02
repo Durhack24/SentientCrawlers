@@ -9,14 +9,14 @@ Simulator::Simulator(size_t numCrawlers)
 
 }
 
-static double Distance(double x, double y, const RiverPoint& p)
+static double Distance(double x, double y, const Point& p)
 {
 	double dx = x - p.x;
 	double dy = y - p.y;
 	return std::hypot(dx, dy);
 }
 
-static double Distance(double x, double y, const RiverPoint& p0, const RiverPoint& p1)
+static double Distance(double x, double y, const Point& p0, const Point& p1)
 {
 	double w = p1.x - p0.x;
 	double h = p1.y - p0.y;
@@ -43,6 +43,7 @@ void Simulator::Step(size_t num)
 		{
 			// Determine stimuli
 
+
 			// Step the crawler
 			//crawler.Step();
 		}
@@ -52,4 +53,14 @@ void Simulator::Step(size_t num)
 void Simulator::NextGeneration()
 {
 
+}
+
+double Simulator::ClosestBar(const Crawler& crawler)
+{
+	return 0.0;
+}
+
+double Simulator::ClosestBarDir(const Crawler& crawler)
+{
+	return 0.0;
 }

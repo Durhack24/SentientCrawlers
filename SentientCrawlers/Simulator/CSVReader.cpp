@@ -28,11 +28,11 @@ std::vector<CollegeBar> CSVReader::ParseBars(const std::string& path)
     return bars;
 }
 
-std::vector<RiverPoint> CSVReader::ParseRiverPoints(const std::string& path)
+std::vector<Point> CSVReader::ParsePoints(const std::string& path)
 {
     auto values = Parse(path);
 
-    std::vector<RiverPoint> points;
+    std::vector<Point> points;
     points.reserve(values.size());
 
     for (auto& value : values)
