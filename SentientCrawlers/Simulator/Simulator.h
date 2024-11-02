@@ -13,8 +13,10 @@ public:
 	void Step(size_t num = 1);
 	void NextGeneration();
 
+	const std::vector<Crawler>& GetCrawlers() const;
+
 protected:
-	std::vector<Crawler> crawlers;
+	std::vector<Crawler> crawlers, crawlersBuf{};
 
 	std::pair<double, double> ClosestBar(const Crawler& crawler);
     std::pair<double, double> ClosestRiverPoint(const Crawler& crawler);
