@@ -14,7 +14,7 @@ Crawler Crawler::Mutate(const Crawler& c)
     return { newBrain, c.pos, c.dir };
 }
 
-void Crawler::Step(const std::vector<double>& stimuli, bool inBar, uint32_t barIdx)
+void Crawler::Step(const std::vector<double>& stimuli, std::optional<uint32_t> barIdx)
 {
     numSteps++;
 
@@ -35,9 +35,9 @@ void Crawler::Step(const std::vector<double>& stimuli, bool inBar, uint32_t barI
         visitedBars = 0;
 
 	// Update bar minutes
-    if (inBar)
+    if (barIdx.has_value())
     {
-        uint32_t newVisitedBars = visitedBars | (1 << barIdx);
+        uint32_t newVisitedBars = visitedBars | (1 << barIdx.value());
         if (visitedBars != newVisitedBars)
         {
             intoxication += 1;

@@ -20,7 +20,7 @@ public:
 
     static Crawler Mutate(const Crawler& c);
 
-    void Step(const std::vector<double>& stimuli, bool inBar, uint32_t barIdx);
+    void Step(const std::vector<double>& stimuli, std::optional<uint32_t> barIdx);
 	void Reset(Point pos_, double dir_);
 	int GetBarMinutes();
     double GetAverageIntoxication() const;

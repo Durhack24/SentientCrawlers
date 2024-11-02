@@ -57,15 +57,18 @@ void Simulator::Step(size_t num)
 		for (Crawler& crawler : crawlers)
 		{
 			// Determine stimuli
-            auto [barIdx, barDistance, barDir] = ClosestBar(crawler);
+            auto [barDistance, barDir] = ClosestBar(crawler);
             double minutesAtBar = MinutesSpentAtBar(crawler);
             auto [riverDistance, riverDir] = ClosestRiverPoint(crawler);
             auto [bridgeDistance, bridgeDir] = ClosestBridge(crawler);
             std::vector<double> stimuli{ barDistance, barDir, minutesAtBar,
                 riverDistance, riverDir, bridgeDistance, bridgeDir };
 
+            // Get current bar
+            auto currentBarIdx = GetCurrentBar(crawler);
+
 			// Step the crawler
-			crawler.Step(stimuli, barDistance < 16, barIdx);
+			crawler.Step(stimuli, currentBarIdx);
 		}
 	}
 
@@ -74,7 +77,7 @@ void Simulator::Step(size_t num)
 
 static double Cost(const Crawler& c)
 {
-    return c.numVisitedBars + c.GetAverageIntoxication() - c.numBeatings * 0.5;
+    return c.numVisitedBars + c.GetAverageIntoxication() - c.numBeatings * 10;
 }
 
 void Simulator::NextGeneration()
@@ -97,7 +100,18 @@ std::vector<Crawler> Simulator::GetCrawlers()
     return crawlersBuf;
 }
 
-std::tuple<uint32_t, double, double> Simulator::ClosestBar(const Crawler& crawler)
+std::optional<uint32_t> Simulator::GetCurrentBar(const Crawler& crawler)
+{
+    const std::vector<CollegeBar>& bars = Map::GetBars();
+
+    for (size_t i = 0; i < bars.size(); ++i)
+        if (Distance(crawler.pos, bars[i].pos) < 16)
+            return i;
+
+    return std::nullopt;
+}
+
+std::pair<double, double> Simulator::ClosestBar(const Crawler& crawler)
 {
     uint32_t closestBarIdx = 0;
     double closestDistance = INFINITY;
@@ -118,7 +132,7 @@ std::tuple<uint32_t, double, double> Simulator::ClosestBar(const Crawler& crawle
 
     const CollegeBar& closestBar = bars[closestBarIdx];
     double absDirection = atan2(closestBar.pos.y - crawler.pos.y, closestBar.pos.x - crawler.pos.x) - crawler.dir;
-	return { closestBarIdx, closestDistance, NormalizeAngle(absDirection) };
+	return { closestDistance, NormalizeAngle(absDirection) };
 }
 
 std::pair<double, double> Simulator::ClosestRiverPoint(const Crawler& crawler)

@@ -104,7 +104,7 @@ void Interface::Render()
                 if (numVisited > maxBarsVisited)
                     maxBarsVisited = numVisited;
 
-                float col = ((crawler.visitedBars & 1) && (crawler.minutesAtBar == 0)) * 255.0f;
+                float col = ((crawler.numBeatings) * 255.0f);
                 draw->AddCircleFilled(PointToScreen(pos, size, crawler.pos), 5.0f, IM_COL32(col, col, col, 255));
             }
         }

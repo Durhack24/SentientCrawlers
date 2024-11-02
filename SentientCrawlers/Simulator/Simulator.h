@@ -21,7 +21,8 @@ protected:
 	std::vector<Crawler> crawlers, crawlersBuf{};
 	Point startPos;
 
-    std::tuple<uint32_t, double, double> ClosestBar(const Crawler& crawler);
+    std::optional<uint32_t> GetCurrentBar(const Crawler& crawler);
+    std::pair<double, double> ClosestBar(const Crawler& crawler);
     std::pair<double, double> ClosestRiverPoint(const Crawler& crawler);
     int MinutesSpentAtBar(const Crawler& crawler);
     std::pair<double, double> ClosestBridge(const Crawler& crawler);
