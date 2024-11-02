@@ -55,11 +55,13 @@ void Brain::MutateLayer(std::vector<double>& layer)
         // 25% chance of mutating a weight
         if (probability(gen) > 0.25)
             continue;
+        // 5% chance that we completely randomize the weight
         if (probability(gen) > 0.95)
         {
             layer[i] = dist(gen);
             continue;
         }
+        // We just shift the weight a little bit
         layer[i] += dist(gen) * 0.05;
     }
 }
