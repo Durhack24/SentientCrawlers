@@ -12,8 +12,6 @@ add_executable(SentientCrawlers "main.cpp" "ImGui/imconfig.h" "ImGui/imgui.cpp" 
 target_link_libraries(SentientCrawlers PRIVATE OpenGL::GL)
 find_package(glfw3 REQUIRED)
 target_link_libraries(SentientCrawlers PRIVATE glfw)
-#target_link_libraries(SentientCrawlers PRIVATE "C:/sdks/glfw3/lib/glfw3.lib")
-#target_include_directories(SentientCrawlers PRIVATE "C:/sdks/glfw3/include")
 
 # === Feature Enables ===
 if (SCRWL_MSVC_STATIC_RUNTIME)
