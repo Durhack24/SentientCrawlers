@@ -3,9 +3,14 @@
 #include "CSVReader.h"
 #include "../Resources/ResourceManager.h"
 
-static std::vector<CollegeBar> bars = CSVReader::ParseBars(ResourceManager::GetResourcePath("bars.csv"));
-static std::vector<RiverPoint> river = CSVReader::ParseRiverPoints(ResourceManager::GetResourcePath("river.csv"));
+static std::vector<CollegeBar> bars;
+static std::vector<RiverPoint> river;
 
+void Map::Load()
+{
+    bars = CSVReader::ParseBars(ResourceManager::GetResourcePath("bars.csv"));
+    river = CSVReader::ParseRiverPoints(ResourceManager::GetResourcePath("river.csv"));
+}
 
 const std::vector<CollegeBar>& Map::GetBars()
 {

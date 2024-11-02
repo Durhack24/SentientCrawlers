@@ -14,7 +14,7 @@ void Simulator::Step(size_t num)
 			// Determine stimuli
 
 			// Step the crawler
-			crawler.Step();
+//			crawler.Step();
 		}
 	}
 }

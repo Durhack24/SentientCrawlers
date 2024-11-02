@@ -5,6 +5,8 @@
 
 #include "Simulator/Brain.h"
 
+#include "Simulator/Map.h"
+
 int main(int argc, char** argv)
 {
 #if 0
@@ -23,9 +25,15 @@ int main(int argc, char** argv)
     // Main loop
     app.MainLoop();
 #else
+    ResourceManager::AddSearchPath(argv[0]);
+    ResourceManager::FindResources();
+
     Brain b = Brain::Random();
 
     std::vector<double> stimuli{ 1, 2, 3, 4, 5, 6 };
     auto res = b.Think(stimuli);
+
+    Map::Load();
+    auto river = Map::GetBars();
 #endif
 }
