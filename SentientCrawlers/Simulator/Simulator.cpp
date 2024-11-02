@@ -1,12 +1,21 @@
 #include "Simulator.h"
 
 #include <cmath>
+#include <numbers>
 
 #include "Map.h"
 
-Simulator::Simulator(size_t numCrawlers)
+Simulator::Simulator(size_t numCrawlers, const Point& startPos)
 {
+    crawlers.reserve(numCrawlers);
+    for (size_t i = 0; i < numCrawlers; ++i)
+        crawlers.emplace_back(startPos.x, startPos.y, 0.0);
+}
 
+static inline double NormalizeAngle(double angle)
+{
+    constexpr double twoPi = (2 * std::numbers::pi);
+    return angle - twoPi * std::round(angle / twoPi);
 }
 
 static double Distance(double x, double y, const Point& p)
@@ -55,12 +64,20 @@ void Simulator::NextGeneration()
 
 }
 
-double Simulator::ClosestBar(const Crawler& crawler)
+std::pair<double, double> ClosestBar(const Crawler& crawler)
 {
-	return 0.0;
-}
+    const CollegeBar* closestBar = nullptr;
+    double closestDistance = INFINITY;
+    for (auto& bar : Map::GetBars())
+    {
+        double distance = Distance(crawler.xPos, crawler.yPos, bar.pos);
+        if (distance < closestDistance)
+        {
+            closestBar = &bar;
+            closestDistance = distance;
+        }
+    }
 
-double Simulator::ClosestBarDir(const Crawler& crawler)
-{
-	return 0.0;
+    double absDirection = atan2(closestBar->pos.y - crawler.yPos, closestBar->pos.x - crawler.xPos) - crawler.dir;
+	return { closestDistance, NormalizeAngle(absDirection) };
 }

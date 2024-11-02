@@ -4,6 +4,8 @@
 class Crawler
 {
 public:
+    double xPos, yPos, dir;
+
 	Crawler(double xPos_, double yPos_, double dir_);
 
     void Step(const std::vector<double>& stimuli, bool inBar);
@@ -13,7 +15,6 @@ public:
 protected:
 	Brain brain;
 
-	double xPos, yPos, dir;
 	double intoxication = 0;
 	int minutesAtBar = 0;
 };

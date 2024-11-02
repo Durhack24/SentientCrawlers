@@ -1,12 +1,14 @@
 #pragma once
 #include <vector>
+#include <utility>
 
 #include "Crawler.h"
+#include "Point.h"
 
 class Simulator
 {
 public:
-	Simulator(size_t numCrawlers);
+	Simulator(size_t numCrawlers, const Point& startPos);
 
 	void Step(size_t num = 1);
 	void NextGeneration();
@@ -14,6 +16,5 @@ public:
 protected:
 	std::vector<Crawler> crawlers;
 
-	double ClosestBar(const Crawler& crawler);
-	double ClosestBarDir(const Crawler& crawler);
+	std::pair<double, double> ClosestBar(const Crawler& crawler);
 };
