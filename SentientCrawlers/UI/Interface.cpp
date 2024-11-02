@@ -94,7 +94,7 @@ void Interface::Render()
         {
             const auto& crawlers = sim->GetCrawlers();
             for (const auto& crawler : crawlers)
-                draw->AddCircleFilled(PointToScreen(pos, size, Point{ crawler.xPos, crawler.yPos }), 5.0f, IM_COL32(255, 255, 0, 255));
+                draw->AddCircleFilled(PointToScreen(pos, size, crawler.pos), 5.0f, IM_COL32(255, 255, 0, 255));
         }
         
 
