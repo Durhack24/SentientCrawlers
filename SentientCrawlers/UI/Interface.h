@@ -8,6 +8,7 @@
 enum class SimulatorState
 {
 	Idle,
+	RunningOneMinute,
 	RunningOneGen,
 	RunningAtMax
 };
@@ -29,6 +30,7 @@ protected:
 	SimulatorState simState = SimulatorState::Idle;
 
 	void SimulatorThread();
+	void RunOneMinute();
 	void RunOneGen();
 	void RunAtMax();
 

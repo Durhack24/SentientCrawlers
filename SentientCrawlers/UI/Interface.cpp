@@ -46,6 +46,8 @@ void Interface::Render()
             ImGui::BeginDisabled();
 
         ImGui::InputInt("Crawl Duration", &crawlDuration);
+        if (ImGui::Button("One Minute") && simState == SimulatorState::Idle)
+            simState = SimulatorState::RunningOneMinute;
         if (ImGui::Button("One Generation") && simState == SimulatorState::Idle)
             simState = SimulatorState::RunningOneGen;
         if (ImGui::Button("Run at Max"))
@@ -84,6 +86,10 @@ void Interface::SimulatorThread()
         {
         case SimulatorState::Idle:
             break;
+        case SimulatorState::RunningOneMinute:
+            RunOneMinute();
+            simState = SimulatorState::Idle;
+            break;
         case SimulatorState::RunningOneGen:
             RunOneGen();
             simState = SimulatorState::Idle;
@@ -93,6 +99,12 @@ void Interface::SimulatorThread()
             break;
         }
     }
+}
+
+void Interface::RunOneMinute()
+{
+    std::cout << "1 minute!\n";
+    sim->Step(1);
 }
 
 void Interface::RunOneGen()

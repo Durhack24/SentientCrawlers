@@ -51,13 +51,15 @@ void Simulator::Step(size_t num)
 		for (Crawler& crawler : crawlers)
 		{
 			// Determine stimuli
-            auto [closestBar, closestBarDir] = ClosestBar(crawler);
+            auto [barDistance, barDir] = ClosestBar(crawler);
             double minutesAtBar = MinutesSpentAtBar(crawler);
-            double distanceToRiver = DistanceToRiver(crawler);
-            auto [closestBridge, closestBridgeDir] = ClosestBridge(crawler);
+            auto [riverDistance, riverDir] = ClosestRiverPoint(crawler);
+            auto [bridgeDistance, bridgeDir] = ClosestBridge(crawler);
+            std::vector<double> stimuli{ barDistance, barDir, minutesAtBar,
+                riverDistance, riverDir, bridgeDistance, bridgeDir };
 
 			// Step the crawler
-			//crawler.Step();
+			crawler.Step(stimuli, barDistance < 16);
 		}
 	}
 }
