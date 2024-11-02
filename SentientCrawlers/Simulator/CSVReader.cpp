@@ -15,14 +15,6 @@ std::vector<std::vector<std::string>> CSVReader::Parse(const std::string& path)
     return result;
 }
 
-std::vector<std::string> CSVReader::Split(std::string_view str, std::string_view delim)
-{
-    std::vector<std::string> split;
-    for (auto part : std::ranges::split_view(str, delim))
-        split.emplace_back(part.begin(), part.end());
-    return split;
-}
-
 std::vector<CollegeBar> CSVReader::ParseBars(const std::string& path)
 {
     auto values = Parse(path);
@@ -34,4 +26,25 @@ std::vector<CollegeBar> CSVReader::ParseBars(const std::string& path)
         bars.emplace_back(value[0], std::stoi(value[1]), std::stoi(value[2]));
 
     return bars;
+}
+
+std::vector<RiverPoint> CSVReader::ParseRiverPoints(const std::string& path)
+{
+    auto values = Parse(path);
+
+    std::vector<RiverPoint> points;
+    points.reserve(values.size());
+
+    for (auto& value : values)
+        points.emplace_back(std::stoi(value[0]), std::stoi(value[1]));
+
+    return points;
+}
+
+std::vector<std::string> CSVReader::Split(std::string_view str, std::string_view delim)
+{
+    std::vector<std::string> split;
+    for (auto part : std::ranges::split_view(str, delim))
+        split.emplace_back(part.begin(), part.end());
+    return split;
 }
