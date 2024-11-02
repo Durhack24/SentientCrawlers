@@ -51,7 +51,7 @@ void Simulator::Step(size_t num)
 		for (Crawler& crawler : crawlers)
 		{
 			// Determine stimuli
-            auto [barDistance, barDir] = ClosestBar(crawler);
+            auto [barIdx, barDistance, barDir] = ClosestBar(crawler);
             double minutesAtBar = MinutesSpentAtBar(crawler);
             auto [riverDistance, riverDir] = ClosestRiverPoint(crawler);
             auto [bridgeDistance, bridgeDir] = ClosestBridge(crawler);
@@ -59,7 +59,7 @@ void Simulator::Step(size_t num)
                 riverDistance, riverDir, bridgeDistance, bridgeDir };
 
 			// Step the crawler
-			crawler.Step(stimuli, barDistance < 16);
+			crawler.Step(stimuli, barDistance < 16, barIdx);
 		}
 	}
 }
@@ -69,22 +69,28 @@ void Simulator::NextGeneration()
 
 }
 
-std::pair<double, double> Simulator::ClosestBar(const Crawler& crawler)
+std::tuple<uint32_t, double, double> Simulator::ClosestBar(const Crawler& crawler)
 {
-    const Point* closestBar = nullptr;
+    uint32_t closestBarIdx = 0;
     double closestDistance = INFINITY;
-    for (auto& bar : Map::GetBars())
+    const std::vector<CollegeBar>& bars = Map::GetBars();
+
+    for (size_t i = 0; i < bars.size(); ++i)
     {
-        double distance = Distance(crawler.pos, bar.pos);
+        if (crawler.visitedBars & (1 << i))
+            continue;
+
+        double distance = Distance(crawler.pos, bars[i].pos);
         if (distance < closestDistance)
         {
-            closestBar = &bar.pos;
+            closestBarIdx = i;
             closestDistance = distance;
         }
     }
 
-    double absDirection = atan2(closestBar->y - crawler.pos.y, closestBar->x - crawler.pos.x) - crawler.dir;
-	return { closestDistance, NormalizeAngle(absDirection) };
+    const CollegeBar& closestBar = bars[closestBarIdx];
+    double absDirection = atan2(closestBar.pos.y - crawler.pos.y, closestBar.pos.x - crawler.pos.x) - crawler.dir;
+	return { closestBarIdx, closestDistance, NormalizeAngle(absDirection) };
 }
 
 std::pair<double, double> Simulator::ClosestRiverPoint(const Crawler& crawler)
