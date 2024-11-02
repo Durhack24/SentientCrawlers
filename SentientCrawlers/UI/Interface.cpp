@@ -70,6 +70,12 @@ void Interface::Render()
                 renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
         }
 
+        if (showBestCrawler)
+        {
+            if (ImGui::Button("Step"))
+
+        }
+
         ImGui::Text("Max Bars: %d", maxBarsVisited);
 
         // Graph

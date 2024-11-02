@@ -15,17 +15,18 @@ public:
 	void NextGeneration();
 
 	std::vector<Crawler> GetCrawlers();
+	static void StepCrawler(const Crawler& crawler);
 
 protected:
 	std::mutex bufMutex;
 	std::vector<Crawler> crawlers, crawlersBuf{};
 	Point startPos;
 
-    std::optional<uint32_t> GetCurrentBar(const Crawler& crawler);
-    std::pair<double, double> ClosestBar(const Crawler& crawler);
-    std::pair<double, double> ClosestRiverPoint(const Crawler& crawler);
-    int MinutesSpentAtBar(const Crawler& crawler);
-    std::pair<double, double> ClosestBridge(const Crawler& crawler);
+    static std::optional<uint32_t> GetCurrentBar(const Crawler& crawler);
+    static std::pair<double, double> ClosestBar(const Crawler& crawler);
+    static std::pair<double, double> ClosestRiverPoint(const Crawler& crawler);
+    static int MinutesSpentAtBar(const Crawler& crawler);
+    static std::pair<double, double> ClosestBridge(const Crawler& crawler);
 
 	void UpdateBuf();
 };

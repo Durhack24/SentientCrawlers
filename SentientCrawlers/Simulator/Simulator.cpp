@@ -52,25 +52,9 @@ static Point ClosestPointOnLine(const Point& a, const Point& p0, const Point& p1
 
 void Simulator::Step(size_t num)
 {
-	for (size_t stepIdx = 0; stepIdx < num; stepIdx++)
-	{
-		for (Crawler& crawler : crawlers)
-		{
-			// Determine stimuli
-            auto [barDistance, barDir] = ClosestBar(crawler);
-            double minutesAtBar = MinutesSpentAtBar(crawler);
-            auto [riverDistance, riverDir] = ClosestRiverPoint(crawler);
-            auto [bridgeDistance, bridgeDir] = ClosestBridge(crawler);
-            std::vector<double> stimuli{ barDistance, barDir, minutesAtBar,
-                riverDistance, riverDir, bridgeDistance, bridgeDir };
-
-            // Get current bar
-            auto currentBarIdx = GetCurrentBar(crawler);
-
-			// Step the crawler
-			crawler.Step(stimuli, currentBarIdx);
-		}
-	}
+    for (size_t stepIdx = 0; stepIdx < num; stepIdx++)
+        for (Crawler& crawler : crawlers)
+            StepCrawler(crawler);
 
     UpdateBuf();
 }
@@ -98,6 +82,23 @@ std::vector<Crawler> Simulator::GetCrawlers()
 {
     std::lock_guard lock{ bufMutex };
     return crawlersBuf;
+}
+
+void Simulator::StepCrawler(const Crawler& crawler)
+{
+    // Determine stimuli
+    auto [barDistance, barDir] = ClosestBar(crawler);
+    double minutesAtBar = MinutesSpentAtBar(crawler);
+    auto [riverDistance, riverDir] = ClosestRiverPoint(crawler);
+    auto [bridgeDistance, bridgeDir] = ClosestBridge(crawler);
+    std::vector<double> stimuli{ barDistance, barDir, minutesAtBar,
+        riverDistance, riverDir, bridgeDistance, bridgeDir };
+
+    // Get current bar
+    auto currentBarIdx = GetCurrentBar(crawler);
+
+    // Step the crawler
+    crawler.Step(stimuli, currentBarIdx);
 }
 
 std::optional<uint32_t> Simulator::GetCurrentBar(const Crawler& crawler)
