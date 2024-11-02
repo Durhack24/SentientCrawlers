@@ -1,6 +1,12 @@
-﻿#include <iostream>
+﻿#include "UI/App.h"
 
 int main()
 {
-    std::cout << "Hello World\n";
+    // Initialize
+    App app;
+    bool initSuccess = app.Initialize();
+    if (!initSuccess) return 1;
+
+    // Main loop
+    app.MainLoop();
 }
