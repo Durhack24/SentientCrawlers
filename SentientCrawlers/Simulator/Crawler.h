@@ -5,6 +5,7 @@ class Crawler
 {
 public:
     double xPos, yPos, dir;
+    int minutesAtBar = 0;
 
 	Crawler(double xPos_, double yPos_, double dir_);
 
@@ -16,5 +17,4 @@ protected:
 	Brain brain;
 
 	double intoxication = 0;
-	int minutesAtBar = 0;
 };

@@ -64,13 +64,48 @@ void Simulator::NextGeneration()
 
 }
 
-std::pair<double, double> ClosestBar(const Crawler& crawler)
+std::pair<double, double> Simulator::ClosestBar(const Crawler& crawler)
 {
-    const CollegeBar* closestBar = nullptr;
+    const Point* closestBar = nullptr;
     double closestDistance = INFINITY;
     for (auto& bar : Map::GetBars())
     {
         double distance = Distance(crawler.xPos, crawler.yPos, bar.pos);
+        if (distance < closestDistance)
+        {
+            closestBar = &bar.pos;
+            closestDistance = distance;
+        }
+    }
+
+    double absDirection = atan2(closestBar->y - crawler.yPos, closestBar->x - crawler.xPos) - crawler.dir;
+	return { closestDistance, NormalizeAngle(absDirection) };
+}
+
+double Simulator::DistanceToRiver(const Crawler& crawler)
+{
+    double closestDistance = INFINITY;
+    const auto& river = Map::GetRiver();
+    for (size_t i = 0; i < river.size() - 1; ++i)
+    {
+        double distance = Distance(crawler.xPos, crawler.yPos, river[i], river[i + 1]);
+        closestDistance = std::min(closestDistance, distance);
+    }
+    return closestDistance;
+}
+
+int Simulator::MinutesSpentAtBar(const Crawler& crawler)
+{
+    return crawler.minutesAtBar;
+}
+
+std::pair<double, double> Simulator::ClosestBridge(const Crawler& crawler)
+{
+    const Point* closestBar = nullptr;
+    double closestDistance = INFINITY;
+    for (auto& bar : Map::GetBridges())
+    {
+        double distance = Distance(crawler.xPos, crawler.yPos, bar);
         if (distance < closestDistance)
         {
             closestBar = &bar;
@@ -78,6 +113,6 @@ std::pair<double, double> ClosestBar(const Crawler& crawler)
         }
     }
 
-    double absDirection = atan2(closestBar->pos.y - crawler.yPos, closestBar->pos.x - crawler.xPos) - crawler.dir;
-	return { closestDistance, NormalizeAngle(absDirection) };
+    double absDirection = atan2(closestBar->y - crawler.yPos, closestBar->x - crawler.xPos) - crawler.dir;
+    return { closestDistance, NormalizeAngle(absDirection) };
 }

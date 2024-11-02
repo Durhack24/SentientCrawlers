@@ -1,7 +1,7 @@
 #include "Crawler.h"
 
 Crawler::Crawler(double xPos_, double yPos_, double dir_)
-	: brain(Brain::Random()), xPos(xPos_), yPos(yPos_), dir(dir_) {}
+	: xPos(xPos_), yPos(yPos_), dir(dir_), brain(Brain::Random()) {}
 
 void Crawler::Step(const std::vector<double>& stimuli, bool inBar)
 {

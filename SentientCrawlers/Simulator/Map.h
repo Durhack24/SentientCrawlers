@@ -11,4 +11,5 @@ public:
 
 	static const std::vector<CollegeBar>& GetBars();
 	static const std::vector<Point>& GetRiver();
+    static const std::vector<Point>& GetBridges();
 };
