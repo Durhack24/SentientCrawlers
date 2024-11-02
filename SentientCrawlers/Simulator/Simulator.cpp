@@ -51,7 +51,10 @@ void Simulator::Step(size_t num)
 		for (Crawler& crawler : crawlers)
 		{
 			// Determine stimuli
-
+            auto [closestBar, closestBarDir] = ClosestBar(crawler);
+            double minutesAtBar = MinutesSpentAtBar(crawler);
+            double distanceToRiver = DistanceToRiver(crawler);
+            auto [closestBridge, closestBridgeDir] = ClosestBridge(crawler);
 
 			// Step the crawler
 			//crawler.Step();
