@@ -27,6 +27,7 @@ protected:
 	bool open = true;
 	volatile bool runSimThread = true;
 	std::unique_ptr<Image> mapImg;
+	int maxBarsVisited = 0;
 
 	int crawlDuration = 300;
 	std::unique_ptr<Simulator> sim;

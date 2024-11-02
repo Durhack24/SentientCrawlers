@@ -8,7 +8,7 @@
 class Simulator
 {
 public:
-	Simulator(size_t numCrawlers, const Point& startPos);
+	Simulator(size_t numCrawlers, const Point& startPos_);
 
 	void Step(size_t num = 1);
 	void NextGeneration();
@@ -17,6 +17,7 @@ public:
 
 protected:
 	std::vector<Crawler> crawlers, crawlersBuf{};
+	Point startPos;
 
     std::tuple<uint32_t, double, double> ClosestBar(const Crawler& crawler);
     std::pair<double, double> ClosestRiverPoint(const Crawler& crawler);

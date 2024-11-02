@@ -14,12 +14,15 @@ public:
     Crawler(Point pos_, double dir_);
 	Crawler(double xPos, double yPos, double dir_);
 
+    static Crawler Mutate(const Crawler& c);
+
     void Step(const std::vector<double>& stimuli, bool inBar, uint32_t barIdx);
-	void Reset(double xPos_, double yPos_, double dir_);
+	void Reset(Point pos_, double dir_);
 	int GetBarMinutes();
 
 protected:
 	Brain brain;
-
 	double intoxication = 0;
+
+    Crawler(const Brain& brain_, Point pos_, double dir_);
 };

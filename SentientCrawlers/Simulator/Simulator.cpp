@@ -2,14 +2,18 @@
 
 #include <cmath>
 #include <numbers>
+#include <algorithm>
 
 #include "Map.h"
 
-Simulator::Simulator(size_t numCrawlers, const Point& startPos)
+#define INITIAL_ANGLE 1.57
+
+Simulator::Simulator(size_t numCrawlers, const Point& startPos_)
+    : startPos(startPos_)
 {
     crawlers.reserve(numCrawlers);
     for (size_t i = 0; i < numCrawlers; ++i)
-        crawlers.emplace_back(startPos.x, startPos.y, 0.0);
+        crawlers.emplace_back(startPos.x, startPos.y, INITIAL_ANGLE);
 
     crawlersBuf = crawlers;
 }
@@ -70,7 +74,16 @@ void Simulator::Step(size_t num)
 
 void Simulator::NextGeneration()
 {
+    std::sort(crawlers.begin(), crawlers.end(), [](const Crawler& a, const Crawler& b) {
+        return a.numVisitedBars > b.numVisitedBars;
+        });
 
+    size_t parentIdx = 0;
+    for (size_t i = crawlers.size() / 2; i < crawlers.size(); i++)
+        crawlers[i] = Crawler::Mutate(crawlers[parentIdx++]);
+
+    for (auto& crawler : crawlers)
+        crawler.Reset(startPos, INITIAL_ANGLE);
 }
 
 const std::vector<Crawler>& Simulator::GetCrawlers() const
