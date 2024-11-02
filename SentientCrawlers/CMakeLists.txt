@@ -8,7 +8,7 @@ include(../macros.cmake)
 add_executable(SentientCrawlers "main.cpp")
 
 # === Feature Enables ===
-if (DHT_MSVC_STATIC_RUNTIME)
+if (SCRWL_MSVC_STATIC_RUNTIME)
     set_property(TARGET SentientCrawlers PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 

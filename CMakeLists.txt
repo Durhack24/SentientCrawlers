@@ -25,8 +25,8 @@ if (USE_LIBCPP)
     add_link_options("-lc++abi")
 endif()
 
-set(DHT_MSVC_STATIC_RUNTIME, OFF CACHE BOOL "Use static C runtime library when taregting MSVC ABI")
-if (DHT_MSVC_STATIC_RUNTIME)
+set(SCRWL_MSVC_STATIC_RUNTIME, OFF CACHE BOOL "Use static C runtime library when taregting MSVC ABI")
+if (SCRWL_MSVC_STATIC_RUNTIME)
     use_static_msvc_crt()
 endif()
 
