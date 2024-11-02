@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <utility>
+#include <mutex>
 
 #include "Crawler.h"
 #include "Point.h"
@@ -13,9 +14,10 @@ public:
 	void Step(size_t num = 1);
 	void NextGeneration();
 
-	const std::vector<Crawler>& GetCrawlers() const;
+	std::vector<Crawler> GetCrawlers();
 
 protected:
+	std::mutex bufMutex;
 	std::vector<Crawler> crawlers, crawlersBuf{};
 	Point startPos;
 
@@ -23,4 +25,6 @@ protected:
     std::pair<double, double> ClosestRiverPoint(const Crawler& crawler);
     int MinutesSpentAtBar(const Crawler& crawler);
     std::pair<double, double> ClosestBridge(const Crawler& crawler);
+
+	void UpdateBuf();
 };

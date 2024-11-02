@@ -69,13 +69,18 @@ void Simulator::Step(size_t num)
 		}
 	}
 
-    crawlersBuf = crawlers;
+    UpdateBuf();
+}
+
+static double Cost(const Crawler& c)
+{
+    return c.numVisitedBars + c.GetAverageIntoxication() - c.numBeatings * 0.5;
 }
 
 void Simulator::NextGeneration()
 {
     std::sort(crawlers.begin(), crawlers.end(), [](const Crawler& a, const Crawler& b) {
-        return a.numVisitedBars > b.numVisitedBars;
+        return Cost(a) > Cost(b);
         });
 
     size_t parentIdx = 0;
@@ -86,8 +91,9 @@ void Simulator::NextGeneration()
         crawler.Reset(startPos, INITIAL_ANGLE);
 }
 
-const std::vector<Crawler>& Simulator::GetCrawlers() const
+std::vector<Crawler> Simulator::GetCrawlers() 
 {
+    std::lock_guard lock{ bufMutex };
     return crawlersBuf;
 }
 
@@ -155,4 +161,11 @@ std::pair<double, double> Simulator::ClosestBridge(const Crawler& crawler)
 
     double absDirection = atan2(closestBridge->y - crawler.pos.y, closestBridge->x - crawler.pos.x) - crawler.dir;
     return { closestDistance, NormalizeAngle(absDirection) };
+}
+
+void Simulator::UpdateBuf()
+{
+    bufMutex.lock();
+    crawlersBuf = crawlers;
+    bufMutex.unlock();
 }

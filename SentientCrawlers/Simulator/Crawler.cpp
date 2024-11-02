@@ -16,12 +16,14 @@ Crawler Crawler::Mutate(const Crawler& c)
 
 void Crawler::Step(const std::vector<double>& stimuli, bool inBar, uint32_t barIdx)
 {
+    numSteps++;
+
     // Have a thought
     auto thought = brain.Think(stimuli);
 
     // Update turn direction
     double turnDel = thought[0] - thought[1];
-    dir += turnDel * 0.25;
+    dir += turnDel * 2;
 
     // Move forward
     double speed = thought[2] * 30;
@@ -37,28 +39,48 @@ void Crawler::Step(const std::vector<double>& stimuli, bool inBar, uint32_t barI
     {
         uint32_t newVisitedBars = visitedBars | (1 << barIdx);
         if (visitedBars != newVisitedBars)
+        {
+            intoxication += 1;
             numVisitedBars++;
+        }
+        else if (minutesAtBar == 0)
+        {
+            numBeatings += 1;
+        }
 
         visitedBars = newVisitedBars;
         minutesAtBar++;
     }
-	else
-		minutesAtBar = 0;
+    else
+    {
+        intoxication = std::max(intoxication - 0.02, 0.0);
+        minutesAtBar = 0;
+    }
+
+    totalIntoxication += intoxication;
 }
 
 void Crawler::Reset(Point pos_, double dir_)
 {
     pos = pos_;
 	dir = dir_;
-	intoxication = 0;
 	minutesAtBar = 0;
     visitedBars = 0;
     numVisitedBars = 0;
+    intoxication = 0;
+    totalIntoxication = 0;
+    numSteps = 0;
+    numBeatings = 0;
 }
 
 int Crawler::GetBarMinutes()
 {
 	return minutesAtBar;
+}
+
+double Crawler::GetAverageIntoxication() const
+{
+    return totalIntoxication / numSteps;
 }
 
 Crawler::Crawler(const Brain& brain_, Point pos_, double dir_)

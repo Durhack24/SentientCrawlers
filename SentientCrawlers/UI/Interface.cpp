@@ -89,19 +89,22 @@ void Interface::Render()
         // Draw the bars
         const auto& bars = Map::GetBars();
         for (const auto& bar : bars)
-            draw->AddCircleFilled(PointToScreen(pos, size, bar.pos), 16.0f, IM_COL32(255, 0, 0, 255));
+        {
+            draw->AddEllipseFilled(PointToScreen(pos, size, bar.pos), 16.0f / mapImg->Width() * size.x,
+                16.0f / mapImg->Height() * size.y, IM_COL32(255, 0, 0, 255));
+        }
 
         // Draw the crawler
         if (sim)
         {
-            const auto& crawlers = sim->GetCrawlers();
+            auto crawlers = sim->GetCrawlers();
             for (const auto& crawler : crawlers)
             {
                 int numVisited = crawler.numVisitedBars;
                 if (numVisited > maxBarsVisited)
                     maxBarsVisited = numVisited;
 
-                float col = (float)numVisited / 16 * 255.0f;
+                float col = ((crawler.visitedBars & 1) && (crawler.minutesAtBar == 0)) * 255.0f;
                 draw->AddCircleFilled(PointToScreen(pos, size, crawler.pos), 5.0f, IM_COL32(col, col, col, 255));
             }
         }
