@@ -15,7 +15,9 @@ public:
 	void NextGeneration();
 
 	std::vector<Crawler> GetCrawlers();
-	static void StepCrawler(const Crawler& crawler);
+	static void StepCrawler(Crawler& crawler);
+
+	void UpdateBuf();
 
 protected:
 	std::mutex bufMutex;
@@ -27,6 +29,4 @@ protected:
     static std::pair<double, double> ClosestRiverPoint(const Crawler& crawler);
     static int MinutesSpentAtBar(const Crawler& crawler);
     static std::pair<double, double> ClosestBridge(const Crawler& crawler);
-
-	void UpdateBuf();
 };

@@ -12,4 +12,5 @@ public:
 
 protected:
 	Crawler best;
+	std::vector<Point> path;
 };

@@ -61,7 +61,7 @@ void Simulator::Step(size_t num)
 
 static double Cost(const Crawler& c)
 {
-    return c.numVisitedBars + c.GetAverageIntoxication() - c.numBeatings * 10;
+    return c.numVisitedBars + c.GetAverageIntoxication() - c.numBeatings;
 }
 
 void Simulator::NextGeneration()
@@ -84,7 +84,7 @@ std::vector<Crawler> Simulator::GetCrawlers()
     return crawlersBuf;
 }
 
-void Simulator::StepCrawler(const Crawler& crawler)
+void Simulator::StepCrawler(Crawler& crawler)
 {
     // Determine stimuli
     auto [barDistance, barDir] = ClosestBar(crawler);
@@ -99,6 +99,13 @@ void Simulator::StepCrawler(const Crawler& crawler)
 
     // Step the crawler
     crawler.Step(stimuli, currentBarIdx);
+}
+
+void Simulator::UpdateBuf()
+{
+    bufMutex.lock();
+    crawlersBuf = crawlers;
+    bufMutex.unlock();
 }
 
 std::optional<uint32_t> Simulator::GetCurrentBar(const Crawler& crawler)
@@ -176,11 +183,4 @@ std::pair<double, double> Simulator::ClosestBridge(const Crawler& crawler)
 
     double absDirection = atan2(closestBridge->y - crawler.pos.y, closestBridge->x - crawler.pos.x) - crawler.dir;
     return { closestDistance, NormalizeAngle(absDirection) };
-}
-
-void Simulator::UpdateBuf()
-{
-    bufMutex.lock();
-    crawlersBuf = crawlers;
-    bufMutex.unlock();
 }

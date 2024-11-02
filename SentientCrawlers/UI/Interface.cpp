@@ -65,7 +65,7 @@ void Interface::Render()
         {
             renderer.reset();
             if (showBestCrawler)
-                renderer = std::make_unique<ShowcaseRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
+                renderer = std::make_unique<ShowcaseRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() }, sim->GetCrawlers()[0]);
             else
                 renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
         }
@@ -73,7 +73,7 @@ void Interface::Render()
         if (showBestCrawler)
         {
             if (ImGui::Button("Step"))
-
+                ((ShowcaseRenderer*)renderer.get())->Step();
         }
 
         ImGui::Text("Max Bars: %d", maxBarsVisited);
@@ -183,4 +183,6 @@ void Interface::RunAtMax()
         sim->NextGeneration();
         std::cout << std::format("Generation: {}\n", counter++);
     }
+
+    sim->UpdateBuf();
 }
