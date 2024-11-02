@@ -1,7 +1,10 @@
 #include "Crawler.h"
 
-Crawler::Crawler(double xPos_, double yPos_, double dir_)
-	: xPos(xPos_), yPos(yPos_), dir(dir_), brain(Brain::Random()) {}
+Crawler::Crawler(Point pos_, double dir_)
+    : pos(pos_), dir(dir_), brain(Brain::Random()) {}
+
+Crawler::Crawler(double xPos, double yPos, double dir_)
+	: pos(xPos, yPos), dir(dir_), brain(Brain::Random()) {}
 
 void Crawler::Step(const std::vector<double>& stimuli, bool inBar)
 {
@@ -14,8 +17,8 @@ void Crawler::Step(const std::vector<double>& stimuli, bool inBar)
 
 	// Move forward
 	double speed = thought[2] * 30;
-	xPos += cos(dir) * speed;
-	yPos += sin(dir) * speed;
+	pos.x += cos(dir) * speed;
+	pos.y += sin(dir) * speed;
 
 	// Update bar minutes
 	if (inBar)
@@ -26,8 +29,8 @@ void Crawler::Step(const std::vector<double>& stimuli, bool inBar)
 
 void Crawler::Reset(double xPos_, double yPos_, double dir_)
 {
-	xPos = xPos_;
-	yPos = yPos_;
+	pos.x = xPos_;
+	pos.y = yPos_;
 	dir = dir_;
 	intoxication = 0;
 	minutesAtBar = 0;
