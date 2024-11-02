@@ -1,13 +1,16 @@
 #pragma once
 #include "Brain.h"
+#include "Point.h"
 
 class Crawler
 {
 public:
-    double xPos, yPos, dir;
+    Point pos;
+    double dir;
     int minutesAtBar = 0;
 
-	Crawler(double xPos_, double yPos_, double dir_);
+    Crawler(Point pos_, double dir_);
+	Crawler(double xPos, double yPos, double dir_);
 
     void Step(const std::vector<double>& stimuli, bool inBar);
 	void Reset(double xPos_, double yPos_, double dir_);
