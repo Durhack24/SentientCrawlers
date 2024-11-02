@@ -1,9 +1,14 @@
 ﻿#include <iostream>
 
 #include "UI/App.h"
+#include "Resources/ResourceManager.h"
 
-int main()
+int main(int argc, char** argv)
 {
+    // Find resources
+    ResourceManager::AddSearchPath(argv[0]);
+    ResourceManager::FindResources();
+
     // Initialize
     App app;
     bool initSuccess = app.Initialize();

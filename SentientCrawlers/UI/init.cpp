@@ -6,6 +6,8 @@
 #include "../ImGui/imgui_impl_glfw.h"
 #include "../ImGui/imgui_impl_opengl3.h"
 
+#include "../Resources/ResourceManager.h"
+
 #include "err.h"
 #include "theme.h"
 
@@ -57,7 +59,8 @@ bool InitializeImGui(GLFWwindow* window)
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Load Fonts
-    io.FontDefault = io.Fonts->AddFontFromFileTTF("C:\\Users\\matty\\source\\repos\\ImguiTesting\\ImguiTesting\\UI\\Montserrat-Regular.ttf", 18.0f);
+    std::string fontPath = ResourceManager::GetResourcePath("Montserrat-Regular.ttf");
+    io.FontDefault = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 18.0f);
 
     return true;
 }
