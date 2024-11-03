@@ -28,7 +28,6 @@ void ShowcaseRenderer::Step(size_t num)
 	for (size_t i = 0; i < num; i++)
 	{
 		Simulator::StepCrawler(best);
-        std::cout << best.numBeatings << '\n';
 		path.push_back(best.pos);
 	}
 }

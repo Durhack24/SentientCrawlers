@@ -75,15 +75,19 @@ void Interface::Render()
         ImGui::InputInt("Crawl Duration", &crawlDuration);
         if (ImGui::Button("One Minute") && simState == SimulatorState::Idle)
             simState = SimulatorState::RunningOneMinute;
+        ImGui::SameLine();
         if (ImGui::Button("One Generation") && simState == SimulatorState::Idle)
             simState = SimulatorState::RunningOneGen;
-        if (ImGui::Button("Run at Max"))
+        ImGui::SameLine();
+        ImGui::PushID(1001);
+        if (ImGui::Button(simState == SimulatorState::RunningAtMax ? "Stop Running" : "Run Nonstop"))
         {
             if (simState == SimulatorState::RunningAtMax)
                 simState = SimulatorState::Idle;
             else if (simState == SimulatorState::Idle)
                 simState = SimulatorState::RunningAtMax;
         }
+        ImGui::PopID();
 
         static bool showBestCrawler = false;
         if (ImGui::Checkbox("Show Best Crawler", &showBestCrawler))
@@ -107,6 +111,8 @@ void Interface::Render()
 
         // === Statistics ===
         UpdateStatistics();
+
+        ImGui::Text("Generation: %zu", sim ? sim->GetGeneration() : 0);
 
         // Statistics text
         ImGui::Text("Max Bars: %d", maxBarsVisited);
@@ -282,9 +288,7 @@ void Interface::UpdateStatistics()
     size_t gen = sim->GetGeneration();
 
     // Update bars visited
-    for (auto& [cost, crawlers] : crawlers)
-        if (cost > 0)
-            maxBarsVisited = std::max(maxBarsVisited, crawlers.numVisitedBars);
+    maxBarsVisited = crawlers[0].second.numVisitedBars;
 
     // Update brain
     graphData.bestBrain = crawlers[0].second.brain;
@@ -342,8 +346,6 @@ void Interface::RunAtMax()
     {
         sim->Step(crawlDuration);
         sim->NextGeneration();
-        std::cout << std::format("Generation: {}\n", counter++);
-        //std::this_thread::sleep_for(50ms);
     }
 
     sim->UpdateBuf();
