@@ -43,6 +43,8 @@ void Interface::Render()
         {
             sim = std::make_unique<Simulator>(numCrawlers, Point{ 620, 1030 - 950 });
             renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
+            graphData.points.clear();
+            graphData.maxY = -INFINITY;
         }
 
         ImGui::Separator();
@@ -203,7 +205,8 @@ void Interface::UpdateStatistics()
 
     // Update bars visited
     for (auto& [cost, crawlers] : crawlers)
-        maxBarsVisited = std::max(maxBarsVisited, crawlers.numVisitedBars);
+        if (cost > 0)
+            maxBarsVisited = std::max(maxBarsVisited, crawlers.numVisitedBars);
 
     // Update points
     Percentiles percentiles;
