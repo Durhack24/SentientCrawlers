@@ -52,9 +52,13 @@ static Point ClosestPointOnLine(const Point& a, const Point& p0, const Point& p1
 
 void Simulator::Step(size_t num)
 {
+
     for (size_t stepIdx = 0; stepIdx < num; stepIdx++)
-        for (auto& [cost, crawler] : crawlers)
-            StepCrawler(crawler);
+    {
+        pool.submit_loop<size_t>(0, crawlers.size(), [this](const size_t i) {
+            StepCrawler(crawlers[i]);
+        }).wait();
+    }
 
     UpdateBuf();
 }
