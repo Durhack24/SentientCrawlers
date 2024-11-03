@@ -3,6 +3,7 @@
 #include <utility>
 #include <mutex>
 
+#include "BS_thread_pool.hpp"
 #include "Crawler.h"
 #include "Point.h"
 
@@ -21,8 +22,9 @@ public:
 
 protected:
 	std::mutex bufMutex;
-	std::vector<Crawler> crawlers, crawlersBuf{};
+	std::vector<Crawler> crawlers, crawlersBuf;
 	Point startPos;
+    BS::thread_pool pool;
 
     static std::optional<uint32_t> GetCurrentBar(const Crawler& crawler);
     static std::pair<double, double> ClosestBar(const Crawler& crawler);

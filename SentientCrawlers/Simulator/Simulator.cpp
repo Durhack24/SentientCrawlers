@@ -52,16 +52,20 @@ static Point ClosestPointOnLine(const Point& a, const Point& p0, const Point& p1
 
 void Simulator::Step(size_t num)
 {
+
     for (size_t stepIdx = 0; stepIdx < num; stepIdx++)
-        for (Crawler& crawler : crawlers)
-            StepCrawler(crawler);
+    {
+        pool.submit_loop<size_t>(0, crawlers.size(), [this](const size_t i) {
+            StepCrawler(crawlers[i]);
+        }).wait();
+    }
 
     UpdateBuf();
 }
 
 static double Cost(const Crawler& c)
 {
-    return c.numVisitedBars * 0 + c.GetAverageIntoxication() * 100 - c.numBeatings;
+    return c.numVisitedBars * 1 + c.GetAverageIntoxication() * 10 - c.numBeatings;
 }
 
 void Simulator::NextGeneration()
