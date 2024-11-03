@@ -126,6 +126,7 @@ void Interface::RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size)
 {
     // Draw the map
     draw->AddImage((ImTextureID)(intptr_t)mapImg->Id(), pos, pos + size);
+    draw->AddRectFilled(pos, pos + size, IM_COL32(0, 0, 0, 50));
 
     // Draw the river
     const auto& river = Map::GetRiver();
@@ -141,7 +142,7 @@ void Interface::RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size)
     for (const auto& bar : bars)
     {
         draw->AddEllipseFilled(PointToScreen(pos, size, bar.pos), 16.0f / mapImg->Width() * size.x,
-            16.0f / mapImg->Height() * size.y, IM_COL32(255, 0, 0, 255));
+            16.0f / mapImg->Height() * size.y, IM_COL32(255, 0, 0, 180));
     }
 }
 
@@ -190,7 +191,7 @@ void Interface::RunAtMax()
         sim->Step(crawlDuration);
         sim->NextGeneration();
         std::cout << std::format("Generation: {}\n", counter++);
-        std::this_thread::sleep_for(50ms);
+        //std::this_thread::sleep_for(50ms);
     }
 
     sim->UpdateBuf();

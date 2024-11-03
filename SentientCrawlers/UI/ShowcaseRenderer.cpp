@@ -14,11 +14,11 @@ void ShowcaseRenderer::Render(ImDrawList* draw, ImVec2 pos, ImVec2 size)
 		ImVec2 p0 = PointToScreen(pos, size, path[i]);
 		ImVec2 p1 = PointToScreen(pos, size, path[i + 1]);
 
-		draw->AddLine(p0, p1, IM_COL32(255, 0, 0, 255), 3.0f);
+		draw->AddLine(p0, p1, IM_COL32(0, 0, 255, 255), 3.0f);
 	}
 
 	// Draw crawler
-    draw->AddCircleFilled(PointToScreen(pos, size, best.pos), 5.0f, IM_COL32(200, 0, 0, 255));
+    draw->AddCircleFilled(PointToScreen(pos, size, best.pos), 5.0f, IM_COL32(0, 0, 200, 255));
 }
 
 void ShowcaseRenderer::Step(size_t num)
