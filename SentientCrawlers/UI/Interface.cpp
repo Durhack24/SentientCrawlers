@@ -4,6 +4,7 @@
 #include <format>
 #include <thread>
 #include <chrono>
+#include <numbers>
 
 #include "../Resources/ResourceManager.h"
 
@@ -38,7 +39,7 @@ void Interface::Render()
 
     static bool showNetworkVisualizer = false;
     if (ImGui::Begin("Layout", &open, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
-        | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking))
+        | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBringToFrontOnFocus))
     {
         if (ImGui::BeginMenuBar())
         {
@@ -51,7 +52,7 @@ void Interface::Render()
         }
 
         // === Sidebar ===
-        ImGui::SetNextWindowSizeConstraints({ 100, -1 }, { 600, -1 });
+        ImGui::SetNextWindowSizeConstraints({ 100, -1 }, { INFINITY, -1 });
         ImGui::BeginChild("sidebar", { 200, 0 }, ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX);
 
         // Configuration
@@ -59,13 +60,15 @@ void Interface::Render()
         ImGui::Text("Configuration");
         ImGui::InputInt("Num Crawlers", &numCrawlers);
 
-        static int xStartPos = 620, yStartPos = 1030 - 950;
+        static int xStartPos = 620, yStartPos = 1030 - 950, startingAngle = 0;
         ImGui::SliderInt("X Start Pos", &xStartPos, 0, mapImg->Width());
         ImGui::SliderInt("Y Start Pos", &yStartPos, 0, mapImg->Height());
+        ImGui::SliderInt("Starting Angle", &startingAngle, 0, 360);
+        double startDirRad = startingAngle / 360.0 * std::numbers::pi * 2;
 
         if (ImGui::Button("Create Simulation"))
         {
-            sim = std::make_unique<Simulator>(numCrawlers, Point{ xStartPos, yStartPos });
+            sim = std::make_unique<Simulator>(numCrawlers, Point{ xStartPos, yStartPos }, startDirRad);
             renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
             graphData.points.clear();
             graphData.maxY = -INFINITY;
@@ -148,8 +151,13 @@ void Interface::Render()
         pos = ImGui::GetCursorScreenPos();
         size = ImGui::GetContentRegionAvail();
         
-        // Render the map, the river, and the bars
+        // Render the map and the bars
         RenderBackdrop(draw, pos, size);
+
+        // Render start pos
+        ImVec2 screenStartPos = PointToScreen(pos, size, Point{ xStartPos, yStartPos });
+        draw->AddCircle(screenStartPos, 5.0f, IM_COL32(255, 0, 255, 255));
+        draw->AddLine(screenStartPos, screenStartPos + ImVec2(cos(startDirRad), -sin(startDirRad)) * 20, IM_COL32(255, 0, 255, 255));
 
         // Render crawlers
         if (renderer)
@@ -202,7 +210,7 @@ void Interface::Render()
                     {
                         double weight = weights[layer][leftNode * arch[layer + 1] + rightNode];
 
-                        auto [r, g, b] = hsv2rgb(sigmoid(weight) * 80 - 40, 255, 255);
+                        auto [r, g, b] = hsv2rgb(sigmoid(weight) / 3 - 0.15f, 1.0, 1.0);
                         draw->AddLine(nodePoints[layer][leftNode] + ImVec2(nodeRadius, 0),
                             nodePoints[layer + 1][rightNode] - ImVec2(nodeRadius, 0), IM_COL32(r, g, b, 255));
                     }
@@ -211,8 +219,8 @@ void Interface::Render()
 
             // Draw Nodes
             for (const auto& layer : nodePoints)
-                for (const ImVec2& pos : layer)
-                    draw->AddCircle(pos, nodeRadius, IM_COL32_WHITE);
+                for (const ImVec2& nodePos : layer)
+                    draw->AddCircle(nodePos, nodeRadius, IM_COL32_WHITE);
         }
 
         ImGui::End();
@@ -258,23 +266,6 @@ void Interface::RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size)
     // Draw the map
     draw->AddImage((ImTextureID)(intptr_t)mapImg->Id(), pos, pos + size);
     draw->AddRectFilled(pos, pos + size, IM_COL32(0, 0, 0, 50));
-
-    // Draw the river
-    const auto& river = Map::GetRiver();
-    for (size_t i = 0; i < river.size() - 1; i++)
-    {
-        Point p0 = river[i];
-        Point p1 = river[i + 1];
-        draw->AddLine(PointToScreen(pos, size, p0), PointToScreen(pos, size, p1), IM_COL32(0, 255, 255, 255), 5.0f);
-    }
-
-    // Draw the bridges
-    const auto& bridges = Map::GetBridges();
-    for (const auto& brige : bridges)
-    {
-        draw->AddEllipseFilled(PointToScreen(pos, size, brige), 30.0f / mapImg->Width() * size.x,
-                30.0f / mapImg->Height() * size.y, IM_COL32(137, 81, 41, 180));
-    }
 
     // Draw the bars
     const auto& bars = Map::GetBars();

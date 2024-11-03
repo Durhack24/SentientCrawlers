@@ -22,7 +22,7 @@ static inline double NormalizeAngle(double angle)
     return angle - twoPi * std::round(angle / twoPi);
 }
 
-void Crawler::Step(const std::vector<double>& stimuli, bool outOfBounds, std::optional<uint32_t> barIdx)
+void Crawler::Step(const std::vector<double>& stimuli, std::optional<uint32_t> barIdx)
 {
     numSteps++;
 
@@ -47,10 +47,6 @@ void Crawler::Step(const std::vector<double>& stimuli, bool outOfBounds, std::op
             intoxication += 1;
             numVisitedBars++;
         }
-        else if (minutesAtBar == 0)
-        {
-            numBeatings += 1;
-        }
 
         visitedBars = newVisitedBars;
         minutesAtBar++;
@@ -59,11 +55,6 @@ void Crawler::Step(const std::vector<double>& stimuli, bool outOfBounds, std::op
     {
         intoxication = std::max(intoxication - 0.02, 0.0);
         minutesAtBar = 0;
-    }
-
-    if (outOfBounds)
-    {
-        numBeatings += 9999;
     }
 
     // Reset visited bars if visited all
@@ -83,7 +74,6 @@ void Crawler::Reset(Point pos_, double dir_)
     intoxication = 0;
     totalIntoxication = 0;
     numSteps = 0;
-    numBeatings = 0;
 }
 
 int Crawler::GetBarMinutes() const
