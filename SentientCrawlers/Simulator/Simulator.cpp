@@ -61,7 +61,7 @@ void Simulator::Step(size_t num)
 
 static double Cost(const Crawler& c)
 {
-    return c.numVisitedBars + c.GetAverageIntoxication() * 10 - c.numBeatings;
+    return c.numVisitedBars * 0 + c.GetAverageIntoxication() * 100 - c.numBeatings;
 }
 
 void Simulator::NextGeneration()
@@ -94,7 +94,7 @@ void Simulator::StepCrawler(Crawler& crawler)
     std::vector<double> stimuli{
         barDistance / 250,
         barDir,
-        minutesAtBar * 0,
+        minutesAtBar * 10,
         riverDistance * 0,
         riverDir * 0,
         bridgeDistance * 0,
