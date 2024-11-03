@@ -23,6 +23,7 @@ using Percentiles = std::array<double, 11>;
 struct GraphData
 {
 	double maxY = -INFINITY;
+	Brain bestBrain;
 	std::vector<std::pair<size_t, Percentiles>> points;
 };
 

@@ -12,6 +12,8 @@
 
 #include "../Simulator/Map.h"
 
+#include "../UI/colorutils.h"
+
 Interface::Interface()
     : open(true), simThread([this]() { this->SimulatorThread(); })
 {
@@ -25,12 +27,29 @@ Interface::~Interface()
     simThread.join();
 }
 
+static inline double sigmoid(double x)
+{
+    return 1.0 / (1.0 + exp(-x));
+}
+
 void Interface::Render()
 {
     ImGuiStyle& style = ImGui::GetStyle();
 
-    if (ImGui::Begin("Layout", &open, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
+    static bool showNetworkVisualizer = false;
+    if (ImGui::Begin("Layout", &open, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
+        | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking))
     {
+        if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::BeginMenu("View"))
+            {
+                ImGui::MenuItem("Network Visualizer", "", &showNetworkVisualizer);
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+
         // === Sidebar ===
         ImGui::SetNextWindowSizeConstraints({ 100, -1 }, { 600, -1 });
         ImGui::BeginChild("sidebar", { 200, 0 }, ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX);
@@ -128,6 +147,65 @@ void Interface::Render()
         ImGui::EndChild();
     }
     ImGui::End();
+
+    if (showNetworkVisualizer && ImGui::Begin("Network Visualizer", &showNetworkVisualizer))
+    {
+        float nodeRadius = 10.0f;
+
+        ImDrawList* draw = ImGui::GetWindowDrawList();
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImVec2 size = ImGui::GetContentRegionAvail();
+
+        draw->AddRectFilled(pos, pos + size, IM_COL32(50, 50, 50, 255));
+
+        if (!graphData.points.empty())
+        {
+            // Get information from brain
+            const auto arch = graphData.bestBrain.GetArchitecture();
+            const auto weights = graphData.bestBrain.GetWeights();
+
+            // Determine node points
+            std::vector<std::vector<ImVec2>> nodePoints;
+            double xSpacing = size.x / (arch.size() + 1);
+            for (size_t layer = 0; layer < arch.size(); layer++)
+            {
+                size_t numNodes = (layer == arch.size() - 1) ? arch[layer] : arch[layer] + 1;
+
+                nodePoints.push_back({});
+
+                double ySpacing = size.y / (numNodes + 1);
+                for (size_t nodeIdx = 0; nodeIdx < numNodes; nodeIdx++)
+                {
+                    float nx = pos.x + xSpacing * (layer + 1);
+                    float ny = pos.y + (size.y - ySpacing * (nodeIdx + 1));
+                    nodePoints[layer].push_back(ImVec2{ nx, ny });
+                }
+            }
+
+            // Draw weights
+            for (size_t layer = 0; layer < arch.size() - 1; layer++)
+            {
+                for (size_t leftNode = 0; leftNode < arch[layer] + 1; leftNode++)
+                {
+                    for (size_t rightNode = 0; rightNode < arch[layer + 1]; rightNode++)
+                    {
+                        double weight = weights[layer][leftNode * arch[layer + 1] + rightNode];
+
+                        auto [r, g, b] = hsv2rgb(sigmoid(weight) * 80 - 40, 255, 255);
+                        draw->AddLine(nodePoints[layer][leftNode] + ImVec2(nodeRadius, 0),
+                            nodePoints[layer + 1][rightNode] - ImVec2(nodeRadius, 0), IM_COL32(r, g, b, 255));
+                    }
+                }
+            }
+
+            // Draw Nodes
+            for (const auto& layer : nodePoints)
+                for (const ImVec2& pos : layer)
+                    draw->AddCircle(pos, nodeRadius, IM_COL32_WHITE);
+        }
+
+        ImGui::End();
+    }
 }
 
 ImVec2 Interface::PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p)
@@ -207,6 +285,9 @@ void Interface::UpdateStatistics()
     for (auto& [cost, crawlers] : crawlers)
         if (cost > 0)
             maxBarsVisited = std::max(maxBarsVisited, crawlers.numVisitedBars);
+
+    // Update brain
+    graphData.bestBrain = crawlers[0].second.brain;
 
     // Update points
     Percentiles percentiles;

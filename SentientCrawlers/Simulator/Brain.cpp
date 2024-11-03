@@ -21,13 +21,27 @@ Brain Brain::Mutate(const Brain& parent)
 	return mutated;
 }
 
-Brain::Layer Brain::Think(const Layer& stimuli)
+Layer Brain::Think(const Layer& stimuli)
 {
     auto h0 = ApplyLayer(stimuli, weights[0]);
     auto h1 = ApplyLayer(h0, weights[1]);
     auto output = ApplyLayer(h1, weights[2]);
 
     return output;
+}
+
+std::vector<size_t> Brain::GetArchitecture() const
+{
+    return { NumInputs, NumHidden0, NumHidden1, NumOutputs };
+}
+
+std::vector<Layer> Brain::GetWeights() const
+{
+    std::vector<Layer> allWeights;
+    for (size_t i = 0; i < weights.size(); i++)
+        allWeights.emplace_back(weights[i]);
+
+    return allWeights;
 }
 
 void Brain::InitializeLayer(Layer& layer, size_t size)
@@ -68,7 +82,7 @@ static inline double sigmoid(double x)
     return 1.0 / (1.0 + exp(-x));
 }
 
-Brain::Layer Brain::ApplyLayer(const Layer& nodes, const Layer& layer)
+Layer Brain::ApplyLayer(const Layer& nodes, const Layer& layer)
 {
     size_t weightWidth = nodes.size() + 1;
     size_t weightHeight = layer.size() / weightWidth;

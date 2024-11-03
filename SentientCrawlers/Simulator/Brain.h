@@ -22,16 +22,18 @@ static constexpr size_t NumOutputs = 3;
 2. Speed
 */
 
+using Layer = std::vector<double>;
+
 class Brain
 {
-protected:
-	using Layer = std::vector<double>;
-
 public:
 	static Brain Random();
 	static Brain Mutate(const Brain& parent);
 
 	Layer Think(const Layer& stimuli);
+
+	std::vector<size_t> GetArchitecture() const;
+	std::vector<Layer> GetWeights() const;
 
 protected:
 	std::array<Layer, 3> weights;

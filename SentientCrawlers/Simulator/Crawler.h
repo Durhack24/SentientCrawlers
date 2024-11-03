@@ -16,6 +16,7 @@ public:
     double totalIntoxication = 0;
     size_t numSteps = 0;
     double numBeatings = 0;
+    Brain brain;
 
     Crawler(Point pos_, double dir_);
 	Crawler(double xPos, double yPos, double dir_);
@@ -28,7 +29,6 @@ public:
     double GetAverageIntoxication() const;
 
 protected:
-	Brain brain;
 
     Crawler(const Brain& brain_, Point pos_, double dir_);
 };
