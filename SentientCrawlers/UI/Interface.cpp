@@ -39,7 +39,7 @@ void Interface::Render()
 
     static bool showNetworkVisualizer = false;
     if (ImGui::Begin("Layout", &open, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
-        | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking))
+        | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBringToFrontOnFocus))
     {
         if (ImGui::BeginMenuBar())
         {
@@ -52,7 +52,7 @@ void Interface::Render()
         }
 
         // === Sidebar ===
-        ImGui::SetNextWindowSizeConstraints({ 100, -1 }, { 600, -1 });
+        ImGui::SetNextWindowSizeConstraints({ 100, -1 }, { INFINITY, -1 });
         ImGui::BeginChild("sidebar", { 200, 0 }, ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX);
 
         // Configuration
