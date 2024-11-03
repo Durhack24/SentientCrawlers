@@ -1,3 +1,10 @@
+# Sentient Crawlers
+
+![This is a cool screenshot](assets/cool-screenshot.png)
+
+![This is another cool screenshot](assets/cool-screenshot-2.png)
+
+
 ## Inspiration
 The very formation of sentient life is perhaps the most fundamental chain of events to ever occur. All of us here today have *evolution* to thank for our existence.
 
