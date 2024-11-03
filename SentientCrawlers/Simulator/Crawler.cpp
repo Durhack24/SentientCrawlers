@@ -1,5 +1,7 @@
 #include "Crawler.h"
 
+#include <numbers>
+
 #include "Map.h"
 
 Crawler::Crawler(Point pos_, double dir_)
@@ -14,6 +16,12 @@ Crawler Crawler::Mutate(const Crawler& c)
     return { newBrain, c.pos, c.dir };
 }
 
+static inline double NormalizeAngle(double angle)
+{
+    constexpr double twoPi = (2 * std::numbers::pi);
+    return angle - twoPi * std::round(angle / twoPi);
+}
+
 void Crawler::Step(const std::vector<double>& stimuli, bool outOfBounds, std::optional<uint32_t> barIdx)
 {
     numSteps++;
@@ -23,16 +31,12 @@ void Crawler::Step(const std::vector<double>& stimuli, bool outOfBounds, std::op
 
     // Update turn direction
     double turnDel = thought[0] - thought[1];
-    dir += turnDel * 6.28;
+    dir = NormalizeAngle(dir + turnDel * 6.28);
 
     // Move forward
     double speed = thought[2] * 30;
     pos.x += cos(dir) * speed;
     pos.y += sin(dir) * speed;
-
-    // Reset visited bars if visited all
-    if (visitedBars == (1 << Map::GetBars().size()) - 1)
-        visitedBars = 0;
 
 	// Update bar minutes
     if (barIdx.has_value())
@@ -61,6 +65,10 @@ void Crawler::Step(const std::vector<double>& stimuli, bool outOfBounds, std::op
     {
         numBeatings += 9999;
     }
+
+    // Reset visited bars if visited all
+    if (visitedBars == (1 << Map::GetBars().size()) - 1)
+        visitedBars = 0;
 
     totalIntoxication += intoxication;
 }

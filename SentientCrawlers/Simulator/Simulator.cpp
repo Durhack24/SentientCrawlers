@@ -114,8 +114,8 @@ void Simulator::StepCrawler(Crawler& crawler)
         minutesAtBar * 0,
         2500 / (riverDistance * riverDistance),
         riverDir,
-        bridgeDistance / 200,
-        bridgeDir };
+        0 * bridgeDistance / 250,
+        0 * bridgeDir };
 
     // Get current bar
     auto currentBarIdx = GetCurrentBar(crawler);

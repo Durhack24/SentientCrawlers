@@ -58,9 +58,14 @@ void Interface::Render()
         static int numCrawlers = 100;
         ImGui::Text("Configuration");
         ImGui::InputInt("Num Crawlers", &numCrawlers);
+
+        static int xStartPos = 620, yStartPos = 1030 - 950;
+        ImGui::SliderInt("X Start Pos", &xStartPos, 0, mapImg->Width());
+        ImGui::SliderInt("Y Start Pos", &yStartPos, 0, mapImg->Height());
+
         if (ImGui::Button("Create Simulation"))
         {
-            sim = std::make_unique<Simulator>(numCrawlers, Point{ 620, 1030 - 950 });
+            sim = std::make_unique<Simulator>(numCrawlers, Point{ xStartPos, yStartPos });
             renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
             graphData.points.clear();
             graphData.maxY = -INFINITY;
@@ -263,11 +268,12 @@ void Interface::RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size)
         draw->AddLine(PointToScreen(pos, size, p0), PointToScreen(pos, size, p1), IM_COL32(0, 255, 255, 255), 5.0f);
     }
 
+    // Draw the bridges
     const auto& bridges = Map::GetBridges();
     for (const auto& brige : bridges)
     {
-        draw->AddEllipseFilled(PointToScreen(pos, size, brige), 20.0f / mapImg->Width() * size.x,
-                20.0f / mapImg->Height() * size.y, IM_COL32(137, 81, 41, 180));
+        draw->AddEllipseFilled(PointToScreen(pos, size, brige), 30.0f / mapImg->Width() * size.x,
+                30.0f / mapImg->Height() * size.y, IM_COL32(137, 81, 41, 180));
     }
 
     // Draw the bars

@@ -77,9 +77,11 @@ void Brain::MutateLayer(Layer& layer)
     }
 }
 
-static inline double sigmoid(double x)
+static inline double activation(double x)
 {
     return 1.0 / (1.0 + exp(-x));
+    //return std::max(-1.0, x);
+    //return tanh(x);
 }
 
 Layer Brain::ApplyLayer(const Layer& nodes, const Layer& layer)
@@ -96,7 +98,7 @@ Layer Brain::ApplyLayer(const Layer& nodes, const Layer& layer)
         for (size_t inputIdx = 0; inputIdx < weightWidth - 1; inputIdx++)
             nodeValue += nodes[inputIdx] * layer[weightWidth * outIdx + inputIdx + 1];
 
-        ret[outIdx] = sigmoid(nodeValue);
+        ret[outIdx] = activation(nodeValue);
     }
 
     return ret;
