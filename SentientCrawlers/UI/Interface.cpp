@@ -72,8 +72,12 @@ void Interface::Render()
 
         if (showBestCrawler)
         {
+            static int numSteps = 1;
             if (ImGui::Button("Step"))
-                ((ShowcaseRenderer*)renderer.get())->Step();
+                ((ShowcaseRenderer*)renderer.get())->Step(numSteps);
+
+            ImGui::SameLine();
+            ImGui::InputInt("Num", &numSteps);
         }
 
         ImGui::Text("Max Bars: %d", maxBarsVisited);

@@ -21,8 +21,11 @@ void ShowcaseRenderer::Render(ImDrawList* draw, ImVec2 pos, ImVec2 size)
     draw->AddCircleFilled(PointToScreen(pos, size, best.pos), 5.0f, IM_COL32(200, 0, 0, 255));
 }
 
-void ShowcaseRenderer::Step()
+void ShowcaseRenderer::Step(size_t num)
 {
-	Simulator::StepCrawler(best);
-	path.push_back(best.pos);
+	for (size_t i = 0; i < num; i++)
+	{
+		Simulator::StepCrawler(best);
+		path.push_back(best.pos);
+	}
 }

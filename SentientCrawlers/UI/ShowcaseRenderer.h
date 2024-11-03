@@ -8,7 +8,7 @@ public:
 	ShowcaseRenderer(Simulator& sim_, Point mapSize_, const Crawler& best_);
 
 	void Render(ImDrawList* draw, ImVec2 pos, ImVec2 size) override;
-	void Step();
+	void Step(size_t num = 1);
 
 protected:
 	Crawler best;
