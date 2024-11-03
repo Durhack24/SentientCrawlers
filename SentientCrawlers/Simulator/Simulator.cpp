@@ -73,22 +73,32 @@ void Simulator::NextGeneration()
     for (auto& [cost, crawler] : crawlers)
         cost = Cost(crawler);
 
+    // Sort the crawlers
     std::sort(crawlers.begin(), crawlers.end(), [](const ScoredCrawler& a, const ScoredCrawler& b) {
         return a.first > b.first;
         });
 
+    // Replace bottom half with mutated top half
     size_t parentIdx = 0;
     for (size_t i = crawlers.size() / 2; i < crawlers.size(); i++)
         crawlers[i].second = Crawler::Mutate(crawlers[parentIdx++].second);
 
+    // Reset all crawlers state (except brain)
     for (auto& [cost, crawler] : crawlers)
         crawler.Reset(startPos, INITIAL_ANGLE);
+
+    gen++;
 }
 
 std::vector<ScoredCrawler> Simulator::GetCrawlers()
 {
     std::lock_guard lock{ bufMutex };
     return crawlersBuf;
+}
+
+size_t Simulator::GetGeneration() const
+{
+    return gen;
 }
 
 void Simulator::StepCrawler(Crawler& crawler)

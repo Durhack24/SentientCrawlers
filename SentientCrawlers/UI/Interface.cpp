@@ -82,10 +82,20 @@ void Interface::Render()
             ImGui::InputInt("Num", &numSteps);
         }
 
+        // === Statistics ===
+        UpdateStatistics();
+
+        // Statistics text
         ImGui::Text("Max Bars: %d", maxBarsVisited);
 
         // Graph
-        ImGui::BeginChild("graph", { 0, 200 }, ImGuiChildFlags_Border);
+        ImGui::BeginChild("graph", { 0, -FLT_MIN }, ImGuiChildFlags_Border);
+        ImDrawList* draw = ImGui::GetWindowDrawList();
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImVec2 size = ImGui::GetContentRegionAvail();
+
+        if (!graphData.points.empty())
+            RenderGraph(draw, pos, size);
         ImGui::EndChild();
 
         if (!sim)
@@ -98,9 +108,9 @@ void Interface::Render()
         ImGui::BeginChild("canvas");
 
         // Useful variables
-        ImDrawList* draw = ImGui::GetWindowDrawList();
-        ImVec2 pos = ImGui::GetCursorScreenPos();
-        ImVec2 size = ImGui::GetContentRegionAvail();
+        draw = ImGui::GetWindowDrawList();
+        pos = ImGui::GetCursorScreenPos();
+        size = ImGui::GetContentRegionAvail();
         
         // Render the map, the river, and the bars
         RenderBackdrop(draw, pos, size);
@@ -120,6 +130,32 @@ ImVec2 Interface::PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p)
     float screenY = (1.0 - p.y / mapImg->Height()) * canvasSize.y + canvasPos.y;
 
     return { screenX, screenY };
+}
+
+void Interface::RenderGraph(ImDrawList* draw, ImVec2 pos, ImVec2 size)
+{
+    draw->AddRectFilled(pos, pos + size, IM_COL32_WHITE);
+
+    size_t maxX = graphData.points.back().first;
+    for (size_t percentile = 0; percentile <= 10; percentile++)
+    {
+        for (size_t dataIdx = 0; dataIdx < graphData.points.size() - 1; dataIdx++)
+        {
+            size_t x0 = graphData.points[dataIdx].first;
+            double y0 = graphData.points[dataIdx].second[percentile];
+
+            size_t x1 = graphData.points[dataIdx + 1].first;
+            double y1 = graphData.points[dataIdx + 1].second[percentile];
+
+            float screenX0 = (float)x0 / maxX * size.x + pos.x;
+            float screenX1 = (float)x1 / maxX * size.x + pos.x;
+
+            float screenY0 = (1 - y0 / graphData.maxY) * size.y + pos.y;
+            float screenY1 = (1 - y1 / graphData.maxY) * size.y + pos.y;
+
+            draw->AddLine({ screenX0, screenY0 }, { screenX1, screenY1 }, IM_COL32(0, 0, 0, 255));
+        }
+    }
 }
 
 void Interface::RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size)
@@ -144,6 +180,28 @@ void Interface::RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size)
         draw->AddEllipseFilled(PointToScreen(pos, size, bar.pos), 16.0f / mapImg->Width() * size.x,
             16.0f / mapImg->Height() * size.y, IM_COL32(255, 0, 0, 180));
     }
+}
+
+void Interface::UpdateStatistics()
+{
+    if (!sim)
+        return;
+
+    auto crawlers = sim->GetCrawlers();
+    size_t gen = sim->GetGeneration();
+
+    // Update bars visited
+    for (auto& [cost, crawlers] : crawlers)
+        maxBarsVisited = std::max(maxBarsVisited, crawlers.numVisitedBars);
+
+    // Update points
+    Percentiles percentiles;
+    for (size_t percentile = 0; percentile <= 10; percentile++)
+        percentiles[percentile] = crawlers[(crawlers.size() - 1) * (10 - percentile) / 10].first;
+    graphData.points.push_back({ gen, percentiles });
+
+    // Update maxY
+    graphData.maxY = std::max(graphData.maxY, crawlers[0].first);
 }
 
 void Interface::SimulatorThread()

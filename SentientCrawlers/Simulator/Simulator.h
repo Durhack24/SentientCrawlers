@@ -18,11 +18,13 @@ public:
 	void NextGeneration();
 
 	std::vector<ScoredCrawler> GetCrawlers();
+	size_t GetGeneration() const;
 	static void StepCrawler(Crawler& crawler);
 
 	void UpdateBuf();
 
 protected:
+	size_t gen = 0;
 	std::mutex bufMutex;
 	std::vector<ScoredCrawler> crawlers, crawlersBuf{};
 	Point startPos;

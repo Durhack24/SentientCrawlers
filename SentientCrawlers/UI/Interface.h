@@ -18,15 +18,12 @@ enum class SimulatorState
 	RunningAtMax
 };
 
-enum class InterfaceState
-{
-	Regular,
-	ShowingBest
-};
+using Percentiles = std::array<double, 11>;
 
-struct ShowBestState
+struct GraphData
 {
-
+	double maxY = -INFINITY;
+	std::vector<std::pair<size_t, Percentiles>> points;
 };
 
 class Interface
@@ -45,6 +42,7 @@ protected:
 
 	// Statistics
 	int maxBarsVisited = 0;
+	GraphData graphData;
 
 	// Simulator thread members
 	volatile bool runSimThread = true;
@@ -53,7 +51,10 @@ protected:
 
 	// Render helpers
 	ImVec2 PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p);
+	void RenderGraph(ImDrawList* draw, ImVec2 pos, ImVec2 size);
 	void RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size);
+
+	void UpdateStatistics();
 
 	// Simulator thread methods
 	void SimulatorThread();
