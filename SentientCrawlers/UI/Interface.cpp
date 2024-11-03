@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <format>
+#include <thread>
+#include <chrono>
 
 #include "../Resources/ResourceManager.h"
 
@@ -65,7 +67,7 @@ void Interface::Render()
         {
             renderer.reset();
             if (showBestCrawler)
-                renderer = std::make_unique<ShowcaseRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() }, sim->GetCrawlers()[0]);
+                renderer = std::make_unique<ShowcaseRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() }, sim->GetCrawlers()[0].second);
             else
                 renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
         }
@@ -180,12 +182,15 @@ void Interface::RunOneGen()
 
 void Interface::RunAtMax()
 {
+    using namespace std::chrono_literals;
+
     static size_t counter = 0;
     while (simState == SimulatorState::RunningAtMax)
     {
         sim->Step(crawlDuration);
         sim->NextGeneration();
         std::cout << std::format("Generation: {}\n", counter++);
+        std::this_thread::sleep_for(50ms);
     }
 
     sim->UpdateBuf();

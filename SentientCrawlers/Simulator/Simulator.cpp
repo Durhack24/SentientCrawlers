@@ -13,7 +13,7 @@ Simulator::Simulator(size_t numCrawlers, const Point& startPos_)
 {
     crawlers.reserve(numCrawlers);
     for (size_t i = 0; i < numCrawlers; ++i)
-        crawlers.emplace_back(startPos.x, startPos.y, INITIAL_ANGLE);
+        crawlers.emplace_back(0, Crawler{ startPos.x, startPos.y, INITIAL_ANGLE });
 
     crawlersBuf = crawlers;
 }
@@ -53,7 +53,7 @@ static Point ClosestPointOnLine(const Point& a, const Point& p0, const Point& p1
 void Simulator::Step(size_t num)
 {
     for (size_t stepIdx = 0; stepIdx < num; stepIdx++)
-        for (Crawler& crawler : crawlers)
+        for (auto& [cost, crawler] : crawlers)
             StepCrawler(crawler);
 
     UpdateBuf();
@@ -61,24 +61,28 @@ void Simulator::Step(size_t num)
 
 static double Cost(const Crawler& c)
 {
-    return c.numVisitedBars * 0 + c.GetAverageIntoxication() * 100 - c.numBeatings;
+    return c.numVisitedBars + c.GetAverageIntoxication() * 10 - c.numBeatings;
 }
 
 void Simulator::NextGeneration()
 {
-    std::sort(crawlers.begin(), crawlers.end(), [](const Crawler& a, const Crawler& b) {
-        return Cost(a) > Cost(b);
+    // Calculate costs
+    for (auto& [cost, crawler] : crawlers)
+        cost = Cost(crawler);
+
+    std::sort(crawlers.begin(), crawlers.end(), [](const ScoredCrawler& a, const ScoredCrawler& b) {
+        return a.first > b.first;
         });
 
     size_t parentIdx = 0;
     for (size_t i = crawlers.size() / 2; i < crawlers.size(); i++)
-        crawlers[i] = Crawler::Mutate(crawlers[parentIdx++]);
+        crawlers[i].second = Crawler::Mutate(crawlers[parentIdx++].second);
 
-    for (auto& crawler : crawlers)
+    for (auto& [cost, crawler] : crawlers)
         crawler.Reset(startPos, INITIAL_ANGLE);
 }
 
-std::vector<Crawler> Simulator::GetCrawlers() 
+std::vector<ScoredCrawler> Simulator::GetCrawlers()
 {
     std::lock_guard lock{ bufMutex };
     return crawlersBuf;
@@ -94,7 +98,7 @@ void Simulator::StepCrawler(Crawler& crawler)
     std::vector<double> stimuli{
         barDistance / 250,
         barDir,
-        minutesAtBar * 10,
+        minutesAtBar * 0,
         riverDistance * 0,
         riverDir * 0,
         bridgeDistance * 0,

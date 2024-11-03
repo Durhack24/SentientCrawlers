@@ -37,22 +37,15 @@ void Crawler::Step(const std::vector<double>& stimuli, std::optional<uint32_t> b
 	// Update bar minutes
     if (barIdx.has_value())
     {
-        if (minutesAtBar < 10)
-        {
-            if (speed < 10)
-                intoxication = std::min(20.0, intoxication + 1.5);
-        }
-        else
-            numBeatings += minutesAtBar - 10;
-
         uint32_t newVisitedBars = visitedBars | (1 << barIdx.value());
         if (visitedBars != newVisitedBars)
         {
+            intoxication += 1;
             numVisitedBars++;
         }
         else if (minutesAtBar == 0)
         {
-            numBeatings += 100;
+            numBeatings += 1;
         }
 
         visitedBars = newVisitedBars;

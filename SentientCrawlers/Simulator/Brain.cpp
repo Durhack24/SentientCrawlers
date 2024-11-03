@@ -14,12 +14,6 @@ Brain Brain::Random()
 
 Brain Brain::Mutate(const Brain& parent)
 {
-    static std::mt19937_64 gen{ std::random_device{}() };
-    static std::uniform_real_distribution<float> probability{ 0.0f, 1.0f };
-
-    if (probability(gen) < 0.005f)
-        return Brain::Random();
-
     Brain mutated = parent;
     for (auto& layer : mutated.weights)
         MutateLayer(layer);

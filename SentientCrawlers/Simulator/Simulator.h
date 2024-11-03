@@ -6,6 +6,8 @@
 #include "Crawler.h"
 #include "Point.h"
 
+using ScoredCrawler = std::pair<double, Crawler>;
+
 class Simulator
 {
 public:
@@ -14,14 +16,14 @@ public:
 	void Step(size_t num = 1);
 	void NextGeneration();
 
-	std::vector<Crawler> GetCrawlers();
+	std::vector<ScoredCrawler> GetCrawlers();
 	static void StepCrawler(Crawler& crawler);
 
 	void UpdateBuf();
 
 protected:
 	std::mutex bufMutex;
-	std::vector<Crawler> crawlers, crawlersBuf{};
+	std::vector<ScoredCrawler> crawlers, crawlersBuf{};
 	Point startPos;
 
     static std::optional<uint32_t> GetCurrentBar(const Crawler& crawler);
