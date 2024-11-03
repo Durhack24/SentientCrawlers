@@ -12,7 +12,7 @@ using ScoredCrawler = std::pair<double, Crawler>;
 class Simulator
 {
 public:
-	Simulator(size_t numCrawlers, const Point& startPos_);
+	Simulator(size_t numCrawlers, const Point& startPos_, double initialAngle_);
 
 	void Step(size_t num = 1);
 	void NextGeneration();
@@ -28,11 +28,10 @@ protected:
 	std::mutex bufMutex;
 	std::vector<ScoredCrawler> crawlers, crawlersBuf{};
 	Point startPos;
+    double initialAngle;
     BS::thread_pool pool;
 
     static std::optional<uint32_t> GetCurrentBar(const Crawler& crawler);
     static std::pair<double, double> ClosestBar(const Crawler& crawler);
-    static std::pair<double, double> ClosestRiverPoint(const Crawler& crawler);
     static int MinutesSpentAtBar(const Crawler& crawler);
-    static std::pair<double, double> ClosestBridge(const Crawler& crawler);
 };

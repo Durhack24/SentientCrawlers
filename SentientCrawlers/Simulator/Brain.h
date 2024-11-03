@@ -2,15 +2,11 @@
 #include <array>
 #include <vector>
 
-static constexpr size_t NumInputs = 7;
+static constexpr size_t NumInputs = 3;
 /*
-0. Distance to closest bar
-1. Angle to closest bar (relative to facing)
+0. Distance to the closest bar
+1. Angle to the closest bar (relative to facing)
 2. Time spent at bar
-3. Distance to river
-4. Angle to river (relative to facing)
-5. Distance to closest bridge
-6. Angle to closest bridge (relative to facing)
 */
 
 static constexpr size_t NumHidden0 = 8;

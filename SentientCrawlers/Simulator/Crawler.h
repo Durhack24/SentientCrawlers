@@ -15,7 +15,6 @@ public:
     double intoxication = 0;
     double totalIntoxication = 0;
     size_t numSteps = 0;
-    double numBeatings = 0;
     Brain brain;
 
     Crawler(Point pos_, double dir_);
@@ -23,7 +22,7 @@ public:
 
     static Crawler Mutate(const Crawler& c);
 
-    void Step(const std::vector<double>& stimuli, bool outOfBounds, std::optional<uint32_t> barIdx);
+    void Step(const std::vector<double>& stimuli, std::optional<uint32_t> barIdx);
 	void Reset(Point pos_, double dir_);
 	int GetBarMinutes() const;
     double GetAverageIntoxication() const;

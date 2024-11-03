@@ -14,9 +14,9 @@ void TrainingRenderer::Render(ImDrawList* draw, ImVec2 pos, ImVec2 size)
 
     for (const auto& [cost, crawler] : crawlers)
     {
-        double t = cost / costMax;
-        auto [r, g, b] = hsv2rgb(85 * t, 255, 255);
-        if (cost > 0)
+        double t = (cost == 0) ? 0 : cost / costMax;
+        auto [r, g, b] = hsv2rgb(t / 3.0f, 1.0f, 1.0f);
+        if (cost >= 0)
             draw->AddCircleFilled(PointToScreen(pos, size, crawler.pos), 5.0f, IM_COL32(r, g, b, 255));
     }
 }

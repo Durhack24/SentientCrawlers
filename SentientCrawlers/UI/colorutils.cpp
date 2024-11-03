@@ -2,11 +2,10 @@
 
 #include <algorithm>
 
-std::tuple<uint8_t, uint8_t, uint8_t> hsv2rgb(uint8_t src_h, uint8_t src_s, uint8_t src_v)
+std::tuple<uint8_t, uint8_t, uint8_t> hsv2rgb(float h, float s, float v)
 {
-    float h = src_h * 2.0f;
-    float s = src_s / 255.0f;
-    float v = src_v / 255.0f;
+    h -= floor(h);
+    h *= 512;
 
     float r, g, b;
 
