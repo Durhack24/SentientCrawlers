@@ -94,6 +94,8 @@ void Interface::Render()
         ImVec2 pos = ImGui::GetCursorScreenPos();
         ImVec2 size = ImGui::GetContentRegionAvail();
 
+        draw->AddRectFilled(pos, pos + size, IM_COL32(50, 50, 50, 255));
+
         if (!graphData.points.empty())
             RenderGraph(draw, pos, size);
         ImGui::EndChild();
@@ -134,8 +136,6 @@ ImVec2 Interface::PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p)
 
 void Interface::RenderGraph(ImDrawList* draw, ImVec2 pos, ImVec2 size)
 {
-    draw->AddRectFilled(pos, pos + size, IM_COL32_WHITE);
-
     size_t maxX = graphData.points.back().first;
     for (size_t percentile = 0; percentile <= 10; percentile++)
     {
@@ -153,7 +153,9 @@ void Interface::RenderGraph(ImDrawList* draw, ImVec2 pos, ImVec2 size)
             float screenY0 = (1 - y0 / graphData.maxY) * size.y + pos.y;
             float screenY1 = (1 - y1 / graphData.maxY) * size.y + pos.y;
 
-            draw->AddLine({ screenX0, screenY0 }, { screenX1, screenY1 }, IM_COL32(0, 0, 0, 255));
+            ImU32 col = (percentile == 5) ? IM_COL32(255, 0, 0, 255) : IM_COL32_WHITE;
+            float thickness = (percentile == 5) ? 2.0f : 0.5f;
+            draw->AddLine({ screenX0, screenY0 }, { screenX1, screenY1 }, col, thickness);
         }
     }
 }
