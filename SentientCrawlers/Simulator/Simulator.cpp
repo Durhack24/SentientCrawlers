@@ -64,7 +64,7 @@ void Simulator::Step(size_t num)
 
 static double Cost(const Crawler& c)
 {
-    return c.numVisitedBars + c.GetAverageIntoxication() * 10 - c.numBeatings;
+    return c.numVisitedBars * 100 + c.GetAverageIntoxication() * 10 - c.numBeatings;
 }
 
 void Simulator::NextGeneration()
@@ -112,16 +112,19 @@ void Simulator::StepCrawler(Crawler& crawler)
         barDistance / 250,
         barDir,
         minutesAtBar * 0,
-        riverDistance * 0,
-        riverDir * 0,
-        bridgeDistance * 0,
-        bridgeDir * 0 };
+        2500 / (riverDistance * riverDistance),
+        riverDir,
+        bridgeDistance / 250,
+        bridgeDir };
 
     // Get current bar
     auto currentBarIdx = GetCurrentBar(crawler);
 
+    bool outOfBounds = (riverDistance <= 15 && bridgeDistance > 20) ||
+        crawler.pos.x < 0 || crawler.pos.x > 1305 || crawler.pos.y < 0 || crawler.pos.y > 1030;
+
     // Step the crawler
-    crawler.Step(stimuli, currentBarIdx);
+    crawler.Step(stimuli, outOfBounds, currentBarIdx);
 }
 
 void Simulator::UpdateBuf()

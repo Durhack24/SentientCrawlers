@@ -57,10 +57,12 @@ void Interface::Render()
         if (ImGui::Button("One Generation") && simState == SimulatorState::Idle)
             simState = SimulatorState::RunningOneGen;
         if (ImGui::Button("Run at Max"))
+        {
             if (simState == SimulatorState::RunningAtMax)
                 simState = SimulatorState::Idle;
             else if (simState == SimulatorState::Idle)
                 simState = SimulatorState::RunningAtMax;
+        }
 
         static bool showBestCrawler = false;
         if (ImGui::Checkbox("Show Best Crawler", &showBestCrawler))
@@ -172,7 +174,14 @@ void Interface::RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size)
     {
         Point p0 = river[i];
         Point p1 = river[i + 1];
-        draw->AddLine(PointToScreen(pos, size, p0), PointToScreen(pos, size, p1), IM_COL32(0, 255, 255, 255), 10.0f);
+        draw->AddLine(PointToScreen(pos, size, p0), PointToScreen(pos, size, p1), IM_COL32(0, 255, 255, 255), 5.0f);
+    }
+
+    const auto& bridges = Map::GetBridges();
+    for (const auto& brige : bridges)
+    {
+        draw->AddEllipseFilled(PointToScreen(pos, size, brige), 20.0f / mapImg->Width() * size.x,
+                20.0f / mapImg->Height() * size.y, IM_COL32(137, 81, 41, 180));
     }
 
     // Draw the bars
@@ -231,7 +240,6 @@ void Interface::SimulatorThread()
 
 void Interface::RunOneMinute()
 {
-    std::cout << "1 minute!\n";
     sim->Step(1);
 }
 

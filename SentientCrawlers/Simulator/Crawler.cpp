@@ -14,7 +14,7 @@ Crawler Crawler::Mutate(const Crawler& c)
     return { newBrain, c.pos, c.dir };
 }
 
-void Crawler::Step(const std::vector<double>& stimuli, std::optional<uint32_t> barIdx)
+void Crawler::Step(const std::vector<double>& stimuli, bool outOfBounds, std::optional<uint32_t> barIdx)
 {
     numSteps++;
 
@@ -55,6 +55,11 @@ void Crawler::Step(const std::vector<double>& stimuli, std::optional<uint32_t> b
     {
         intoxication = std::max(intoxication - 0.02, 0.0);
         minutesAtBar = 0;
+    }
+
+    if (outOfBounds)
+    {
+        numBeatings += 9999;
     }
 
     totalIntoxication += intoxication;

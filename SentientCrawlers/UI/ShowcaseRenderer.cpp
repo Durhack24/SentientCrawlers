@@ -1,5 +1,7 @@
 #include "ShowcaseRenderer.h"
 
+#include <iostream>
+
 ShowcaseRenderer::ShowcaseRenderer(Simulator& sim_, Point mapSize_, const Crawler& best_)
 	: Renderer(sim_, mapSize_), best(best_)
 {
@@ -26,6 +28,7 @@ void ShowcaseRenderer::Step(size_t num)
 	for (size_t i = 0; i < num; i++)
 	{
 		Simulator::StepCrawler(best);
+        std::cout << best.numBeatings << '\n';
 		path.push_back(best.pos);
 	}
 }
