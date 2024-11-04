@@ -1,10 +1,11 @@
 #include "colorutils.h"
 
+#include <cmath>
 #include <algorithm>
 
 std::tuple<uint8_t, uint8_t, uint8_t> hsv2rgb(float h, float s, float v)
 {
-    h -= floor(h);
+    h -= std::floor(h);
     h *= 512;
 
     float r, g, b;

@@ -1,5 +1,6 @@
 #include "Crawler.h"
 
+#include <cmath>
 #include <numbers>
 
 #include "Map.h"

@@ -35,9 +35,6 @@ static inline double sigmoid(double x)
 
 void Interface::Render()
 {
-    ImGuiStyle& style = ImGui::GetStyle();
-
-    static bool showNetworkVisualizer = false;
     if (ImGui::Begin("Layout", &open, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
         | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBringToFrontOnFocus))
     {
@@ -167,7 +164,14 @@ void Interface::Render()
     }
     ImGui::End();
 
-    if (showNetworkVisualizer && ImGui::Begin("Network Visualizer", &showNetworkVisualizer))
+    if (showNetworkVisualizer)
+        NetworkVisualizer();
+}
+
+void Interface::NetworkVisualizer()
+{
+    ImGui::SetNextWindowSize({ 600, 600 }, ImGuiCond_Appearing);
+    if (ImGui::Begin("Network Visualizer", &showNetworkVisualizer))
     {
         float nodeRadius = 10.0f;
 
@@ -181,7 +185,7 @@ void Interface::Render()
         {
             // Get information from brain
             const auto arch = graphData.bestBrain.GetArchitecture();
-            const auto weights = graphData.bestBrain.GetWeights();
+            const auto& weights = graphData.bestBrain.GetWeights();
 
             // Determine node points
             std::vector<std::vector<ImVec2>> nodePoints;
@@ -338,7 +342,6 @@ void Interface::RunAtMax()
 {
     using namespace std::chrono_literals;
 
-    static size_t counter = 0;
     while (simState == SimulatorState::RunningAtMax)
     {
         sim->Step(crawlDuration);

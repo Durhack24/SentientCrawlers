@@ -17,8 +17,8 @@ Brain Brain::Mutate(const Brain& parent)
     Brain mutated = parent;
     for (auto& layer : mutated.weights)
         MutateLayer(layer);
-
-	return mutated;
+    
+    return mutated;
 }
 
 Layer Brain::Think(const Layer& stimuli)
@@ -30,18 +30,14 @@ Layer Brain::Think(const Layer& stimuli)
     return output;
 }
 
-std::vector<size_t> Brain::GetArchitecture() const
+std::vector<size_t> Brain::GetArchitecture()
 {
     return { NumInputs, NumHidden0, NumHidden1, NumOutputs };
 }
 
-std::vector<Layer> Brain::GetWeights() const
+const std::array<Layer, 3>& Brain::GetWeights() const
 {
-    std::vector<Layer> allWeights;
-    for (size_t i = 0; i < weights.size(); i++)
-        allWeights.emplace_back(weights[i]);
-
-    return allWeights;
+    return weights;
 }
 
 void Brain::InitializeLayer(Layer& layer, size_t size)

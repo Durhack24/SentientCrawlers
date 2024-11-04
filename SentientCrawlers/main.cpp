@@ -6,7 +6,6 @@
 
 int main(int, char** argv)
 {
-#if 1
     // Find resources
     ResourceManager::AddSearchPath(argv[0]);
     ResourceManager::FindResources();
@@ -28,7 +27,4 @@ int main(int, char** argv)
 
     // Main loop
     app.MainLoop();
-#else
-
-#endif
 }

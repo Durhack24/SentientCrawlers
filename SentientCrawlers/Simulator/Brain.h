@@ -28,8 +28,8 @@ public:
 
 	Layer Think(const Layer& stimuli);
 
-	std::vector<size_t> GetArchitecture() const;
-	std::vector<Layer> GetWeights() const;
+	static std::vector<size_t> GetArchitecture();
+	const std::array<Layer, 3>& GetWeights() const;
 
 protected:
 	std::array<Layer, 3> weights;

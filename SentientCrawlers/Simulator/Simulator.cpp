@@ -7,7 +7,7 @@
 #include "Map.h"
 
 Simulator::Simulator(size_t numCrawlers, const Point& startPos_, double initialAngle_)
-    : startPos(startPos_), initialAngle(initialAngle_)
+    : startPos(startPos_), initialAngle(initialAngle_), pool(std::thread::hardware_concurrency() - 2)
 {
     crawlers.reserve(numCrawlers);
     for (size_t i = 0; i < numCrawlers; ++i)
@@ -27,25 +27,6 @@ static double Distance(const Point& a, const Point& b)
 	double dx = a.x - b.x;
 	double dy = a.y - b.y;
 	return std::hypot(dx, dy);
-}
-
-static Point ClosestPointOnLine(const Point& a, const Point& p0, const Point& p1)
-{
-	double w = p1.x - p0.x;
-	double h = p1.y - p0.y;
-	double dx = a.x - p0.x;
-	double dy = a.y - p0.y;
-
-	double t = (dx * w + dy * h) / (w * w + h * h);
-
-	if (t <= 0)
-		return p0;
-	if (t >= 1)
-		return p1;
-
-	double nearX = p0.x + w * t;
-	double nearY = p0.y + h * t;
-	return Point{ nearX, nearY };
 }
 
 void Simulator::Step(size_t num)

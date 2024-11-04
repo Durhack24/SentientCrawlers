@@ -6,6 +6,7 @@ class Renderer
 {
 public:
 	Renderer(Simulator& sim_, Point mapSize_);
+	virtual ~Renderer() = default;
 
 	virtual void Render(ImDrawList* draw, ImVec2 pos, ImVec2 size) = 0;
 
