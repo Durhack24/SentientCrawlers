@@ -23,9 +23,13 @@ Brain Brain::Mutate(const Brain& parent)
 
 Layer Brain::Think(const Layer& stimuli)
 {
-    auto h0 = ApplyLayer(stimuli, weights[0]);
-    auto h1 = ApplyLayer(h0, weights[1]);
-    auto output = ApplyLayer(h1, weights[2]);
+    thread_local Layer h0(NumHidden0);
+    thread_local Layer h1(NumHidden1);
+    thread_local Layer output(NumOutputs);
+
+    ApplyLayer(h0, stimuli, weights[0]);
+    ApplyLayer(h1, h0, weights[1]);
+    ApplyLayer(output, h1, weights[2]);
 
     return output;
 }
@@ -80,12 +84,11 @@ static inline double activation(double x)
     //return tanh(x);
 }
 
-Layer Brain::ApplyLayer(const Layer& nodes, const Layer& layer)
+void Brain::ApplyLayer(Layer& out, const Layer& nodes, const Layer& layer)
 {
     size_t weightWidth = nodes.size() + 1;
     size_t weightHeight = layer.size() / weightWidth;
 
-    Layer ret(weightHeight);
     for (size_t outIdx = 0; outIdx < weightHeight; outIdx++)
     {
         double nodeValue = layer[weightWidth * outIdx]; // Start with the bias (weight in the first column)
@@ -94,8 +97,6 @@ Layer Brain::ApplyLayer(const Layer& nodes, const Layer& layer)
         for (size_t inputIdx = 0; inputIdx < weightWidth - 1; inputIdx++)
             nodeValue += nodes[inputIdx] * layer[weightWidth * outIdx + inputIdx + 1];
 
-        ret[outIdx] = activation(nodeValue);
+        out[outIdx] = activation(nodeValue);
     }
-
-    return ret;
 }

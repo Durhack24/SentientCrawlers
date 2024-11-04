@@ -33,7 +33,7 @@ void Simulator::Step(size_t num)
 {
     for (size_t stepIdx = 0; stepIdx < num; stepIdx++)
     {
-        pool.submit_loop<size_t>(0, crawlers.size(), [this](const size_t i) {
+        pool.submit_loop<size_t>(0, crawlers.size(), [this](size_t i) {
             StepCrawler(crawlers[i].second);
         }).wait();
     }

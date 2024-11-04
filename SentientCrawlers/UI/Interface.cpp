@@ -16,7 +16,7 @@
 #include "../UI/colorutils.h"
 
 Interface::Interface()
-    : open(true), simThread([this]() { this->SimulatorThread(); })
+    : open(true), simThread([this]() { SimulatorThread(); })
 {
     mapImg = std::make_unique<Image>(ResourceManager::GetResourcePath("map.png"));
 }
@@ -58,6 +58,7 @@ void Interface::Render()
         Sidebar();
 
         // Canvas
+        ImGui::SameLine();
         Canvas();
     }
     ImGui::End();
@@ -158,7 +159,6 @@ void Interface::Sidebar()
 
 void Interface::Canvas()
 {
-    ImGui::SameLine();
     ImGui::BeginChild("canvas");
 
     // Useful variables
@@ -294,30 +294,6 @@ void Interface::RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size)
     }
 }
 
-void Interface::UpdateStatistics()
-{
-    if (!sim)
-        return;
-
-    auto crawlers = sim->GetCrawlers();
-    size_t gen = sim->GetGeneration();
-
-    // Update bars visited
-    maxBarsVisited = crawlers[0].second.numVisitedBars;
-
-    // Update brain
-    graphData.bestBrain = crawlers[0].second.brain;
-
-    // Update points
-    Percentiles percentiles;
-    for (size_t percentile = 0; percentile <= 10; percentile++)
-        percentiles[percentile] = crawlers[(crawlers.size() - 1) * (10 - percentile) / 10].first;
-    graphData.points.push_back({ gen, percentiles });
-
-    // Update maxY
-    graphData.maxY = std::max(graphData.maxY, crawlers[0].first);
-}
-
 void Interface::SimulatorThread()
 {
     while (runSimThread)
@@ -363,6 +339,30 @@ void Interface::RunNonstop()
     }
 
     sim->UpdateBuf();
+}
+
+void Interface::UpdateStatistics()
+{
+    if (!sim)
+        return;
+
+    auto crawlers = sim->GetCrawlers();
+    size_t gen = sim->GetGeneration();
+
+    // Update bars visited
+    maxBarsVisited = crawlers[0].second.numVisitedBars;
+
+    // Update brain
+    graphData.bestBrain = crawlers[0].second.brain;
+
+    // Update points
+    Percentiles percentiles;
+    for (size_t percentile = 0; percentile <= 10; percentile++)
+        percentiles[percentile] = crawlers[(crawlers.size() - 1) * (10 - percentile) / 10].first;
+    graphData.points.push_back({ gen, percentiles });
+
+    // Update maxY
+    graphData.maxY = std::max(graphData.maxY, crawlers[0].first);
 }
 
 double Interface::ToRadians(int deg)

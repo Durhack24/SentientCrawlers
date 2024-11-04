@@ -36,5 +36,5 @@ protected:
 
     static void InitializeLayer(Layer& layer, size_t size);
     static void MutateLayer(Layer& layer);
-	static Layer ApplyLayer(const Layer& nodes, const Layer& layer);
+	static void ApplyLayer(Layer& out, const Layer& nodes, const Layer& layer);
 };

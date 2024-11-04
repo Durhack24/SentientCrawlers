@@ -28,6 +28,5 @@ public:
     double GetAverageIntoxication() const;
 
 protected:
-
     Crawler(const Brain& brain_, Point pos_, double dir_);
 };

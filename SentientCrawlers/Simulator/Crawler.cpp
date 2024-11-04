@@ -39,23 +39,26 @@ void Crawler::Step(const std::vector<double>& stimuli, std::optional<uint32_t> b
     pos.x += cos(dir) * speed;
     pos.y += sin(dir) * speed;
 
-	// Update bar minutes
     if (barIdx.has_value())
     {
+        // Update minutes at bar
+        minutesAtBar++;
+
+        // Update visited bars
         uint32_t newVisitedBars = visitedBars | (1 << barIdx.value());
         if (visitedBars != newVisitedBars)
         {
             intoxication += 1;
             numVisitedBars++;
         }
-
         visitedBars = newVisitedBars;
-        minutesAtBar++;
     }
     else
     {
-        intoxication = std::max(intoxication - 0.02, 0.0);
         minutesAtBar = 0;
+
+        // Decrease intoxication when outside bar
+        intoxication = std::max(intoxication - 0.02, 0.0);
     }
 
     // Reset visited bars if visited all

@@ -63,15 +63,14 @@ protected:
 	void RenderGraph(ImDrawList* draw, ImVec2 pos, ImVec2 size);
 	void RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size);
 
-	void UpdateStatistics();
-
 	// Simulator thread methods
 	void SimulatorThread();
 	void RunOneMinute();
 	void RunOneGen();
 	void RunNonstop();
 
-	// General Util
+	// General utilities
+	void UpdateStatistics();
 	static double ToRadians(int deg);
 
 	std::thread simThread;
