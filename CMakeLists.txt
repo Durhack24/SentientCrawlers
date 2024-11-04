@@ -21,6 +21,7 @@ endif()
 
 set(USE_LIBCPP OFF CACHE BOOL "Use the libc++ standard library")
 if (USE_LIBCPP)
+    add_compile_options("-stdlib=libc++")
     add_link_options("-lc++")
     add_link_options("-lc++abi")
 endif()

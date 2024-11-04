@@ -18,10 +18,11 @@ int main(int, char** argv)
     bool initSuccess = app.Initialize();
     if (!initSuccess)
     {
-        std::cerr << "app.Initialize() Failed!\n";
+        std::cerr << "Failed to initialize app!\n";
         std::terminate();
     }
 
+    // Log OpenGL version
     char* versionStr = (char*)glGetString(GL_VERSION);
     std::cout << "OpenGL Version: " << versionStr;
 

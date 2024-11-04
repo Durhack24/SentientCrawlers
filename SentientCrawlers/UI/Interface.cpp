@@ -35,9 +35,15 @@ static inline double sigmoid(double x)
 
 void Interface::Render()
 {
-    if (ImGui::Begin("Layout", &open, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
-        | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBringToFrontOnFocus))
+    const ImGuiWindowFlags windowFlags =
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar
+        | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoResize
+        | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoBringToFrontOnFocus;
+
+    // Main layout
+    if (ImGui::Begin("Layout", &open, windowFlags))
     {
+        // Menu
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("View"))
@@ -48,124 +54,132 @@ void Interface::Render()
             ImGui::EndMenuBar();
         }
 
-        // === Sidebar ===
-        ImGui::SetNextWindowSizeConstraints({ 100, -1 }, { INFINITY, -1 });
-        ImGui::BeginChild("sidebar", { 200, 0 }, ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX);
+        // Sidebar
+        Sidebar();
 
-        // Configuration
-        static int numCrawlers = 100;
-        ImGui::Text("Configuration");
-        ImGui::InputInt("Num Crawlers", &numCrawlers);
-
-        static int xStartPos = 620, yStartPos = 1030 - 950, startingAngle = 0;
-        ImGui::SliderInt("X Start Pos", &xStartPos, 0, mapImg->Width());
-        ImGui::SliderInt("Y Start Pos", &yStartPos, 0, mapImg->Height());
-        ImGui::SliderInt("Starting Angle", &startingAngle, 0, 360);
-        double startDirRad = startingAngle / 360.0 * std::numbers::pi * 2;
-
-        if (ImGui::Button("Create Simulation"))
-        {
-            sim = std::make_unique<Simulator>(numCrawlers, Point{ xStartPos, yStartPos }, startDirRad);
-            renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
-            graphData.points.clear();
-            graphData.maxY = -INFINITY;
-        }
-
-        ImGui::Separator();
-
-        // Options
-        if (!sim)
-            ImGui::BeginDisabled();
-
-        ImGui::InputInt("Crawl Duration", &crawlDuration);
-        if (ImGui::Button("One Minute") && simState == SimulatorState::Idle)
-            simState = SimulatorState::RunningOneMinute;
-        ImGui::SameLine();
-        if (ImGui::Button("One Generation") && simState == SimulatorState::Idle)
-            simState = SimulatorState::RunningOneGen;
-        ImGui::SameLine();
-        ImGui::PushID(1001);
-        if (ImGui::Button(simState == SimulatorState::RunningAtMax ? "Stop Running" : "Run Nonstop"))
-        {
-            if (simState == SimulatorState::RunningAtMax)
-                simState = SimulatorState::Idle;
-            else if (simState == SimulatorState::Idle)
-                simState = SimulatorState::RunningAtMax;
-        }
-        ImGui::PopID();
-
-        static bool showBestCrawler = false;
-        if (ImGui::Checkbox("Show Best Crawler", &showBestCrawler))
-        {
-            renderer.reset();
-            if (showBestCrawler)
-                renderer = std::make_unique<ShowcaseRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() }, sim->GetCrawlers()[0].second);
-            else
-                renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
-        }
-
-        if (showBestCrawler)
-        {
-            static int numSteps = 1;
-            if (ImGui::Button("Step"))
-                ((ShowcaseRenderer*)renderer.get())->Step(numSteps);
-
-            ImGui::SameLine();
-            ImGui::InputInt("Num", &numSteps);
-        }
-
-        // === Statistics ===
-        UpdateStatistics();
-
-        ImGui::Text("Generation: %zu", sim ? sim->GetGeneration() : 0);
-
-        // Statistics text
-        ImGui::Text("Max Bars: %d", maxBarsVisited);
-
-        // Graph
-        ImGui::BeginChild("graph", { 0, -FLT_MIN }, ImGuiChildFlags_Border);
-        ImDrawList* draw = ImGui::GetWindowDrawList();
-        ImVec2 pos = ImGui::GetCursorScreenPos();
-        ImVec2 size = ImGui::GetContentRegionAvail();
-
-        draw->AddRectFilled(pos, pos + size, IM_COL32(50, 50, 50, 255));
-
-        if (!graphData.points.empty())
-            RenderGraph(draw, pos, size);
-        ImGui::EndChild();
-
-        if (!sim)
-            ImGui::EndDisabled();
-
-        ImGui::EndChild();
-
-        // === Canvas ===
-        ImGui::SameLine();
-        ImGui::BeginChild("canvas");
-
-        // Useful variables
-        draw = ImGui::GetWindowDrawList();
-        pos = ImGui::GetCursorScreenPos();
-        size = ImGui::GetContentRegionAvail();
-        
-        // Render the map and the bars
-        RenderBackdrop(draw, pos, size);
-
-        // Render start pos
-        ImVec2 screenStartPos = PointToScreen(pos, size, Point{ xStartPos, yStartPos });
-        draw->AddCircle(screenStartPos, 5.0f, IM_COL32(255, 0, 255, 255));
-        draw->AddLine(screenStartPos, screenStartPos + ImVec2(cos(startDirRad), -sin(startDirRad)) * 20, IM_COL32(255, 0, 255, 255));
-
-        // Render crawlers
-        if (renderer)
-            renderer->Render(draw, pos, size);
-
-        ImGui::EndChild();
+        // Canvas
+        Canvas();
     }
     ImGui::End();
 
+    // Network visualizer
     if (showNetworkVisualizer)
         NetworkVisualizer();
+}
+
+void Interface::Sidebar()
+{
+    ImGui::SetNextWindowSizeConstraints({ 100, -1 }, { INFINITY, -1 });
+    ImGui::BeginChild("sidebar", { 200, 0 }, ImGuiChildFlags_Border | ImGuiChildFlags_ResizeX);
+
+    // === Simulator Configuration ===
+    static int numCrawlers = 100;
+    ImGui::Text("Configuration");
+    ImGui::InputInt("Num Crawlers", &numCrawlers);
+
+    ImGui::SliderInt("X Start Pos", &xStartPos, 0, mapImg->Width());
+    ImGui::SliderInt("Y Start Pos", &yStartPos, 0, mapImg->Height());
+    ImGui::SliderInt("Starting Angle", &startDir, 0, 360);
+    double startDirRad = startDir / 360.0 * std::numbers::pi * 2;
+
+    if (ImGui::Button("Create Simulation"))
+    {
+        sim = std::make_unique<Simulator>(numCrawlers, Point{ xStartPos, yStartPos }, startDirRad);
+        renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
+        graphData.points.clear();
+        graphData.maxY = -INFINITY;
+    }
+
+    // === Run Options ===
+    if (!sim)
+        ImGui::BeginDisabled();
+
+    ImGui::InputInt("Crawl Duration", &crawlDuration);
+    if (ImGui::Button("One Minute") && simState == SimulatorState::Idle)
+        simState = SimulatorState::RunningOneMinute;
+    ImGui::SameLine();
+    if (ImGui::Button("One Generation") && simState == SimulatorState::Idle)
+        simState = SimulatorState::RunningOneGen;
+    ImGui::SameLine();
+    ImGui::PushID(1001);
+    if (ImGui::Button(simState == SimulatorState::RunningNonstop ? "Stop Running" : "Run Nonstop"))
+    {
+        if (simState == SimulatorState::RunningNonstop)
+            simState = SimulatorState::Idle;
+        else if (simState == SimulatorState::Idle)
+            simState = SimulatorState::RunningNonstop;
+    }
+    ImGui::PopID();
+
+    static bool showBestCrawler = false;
+    if (ImGui::Checkbox("Show Best Crawler", &showBestCrawler))
+    {
+        renderer.reset();
+        if (showBestCrawler)
+            renderer = std::make_unique<ShowcaseRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() }, sim->GetCrawlers()[0].second);
+        else
+            renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
+    }
+
+    if (showBestCrawler)
+    {
+        static int numSteps = 1;
+        if (ImGui::Button("Step"))
+            ((ShowcaseRenderer*)renderer.get())->Step(numSteps);
+
+        ImGui::SameLine();
+        ImGui::InputInt("Num", &numSteps);
+    }
+
+    // === Statistics ===
+    UpdateStatistics();
+
+    // Statistics text
+    ImGui::Text("Generation: %zu", sim ? sim->GetGeneration() : 0);
+    ImGui::Text("Max Bars: %d", maxBarsVisited);
+
+    // Graph
+    ImGui::BeginChild("graph", { 0, -FLT_MIN }, ImGuiChildFlags_Border);
+    ImDrawList* draw = ImGui::GetWindowDrawList();
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+    ImVec2 size = ImGui::GetContentRegionAvail();
+
+    draw->AddRectFilled(pos, pos + size, IM_COL32(50, 50, 50, 255));
+
+    if (!graphData.points.empty())
+        RenderGraph(draw, pos, size);
+    ImGui::EndChild();
+
+    if (!sim)
+        ImGui::EndDisabled();
+
+    ImGui::EndChild();
+}
+
+void Interface::Canvas()
+{
+    ImGui::SameLine();
+    ImGui::BeginChild("canvas");
+
+    // Useful variables
+    ImDrawList* draw = ImGui::GetWindowDrawList();
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+    ImVec2 size = ImGui::GetContentRegionAvail();
+
+    // Render the map and the bars
+    RenderBackdrop(draw, pos, size);
+
+    // Render start pos
+    double startDirRad = ToRadians(startDir);
+    ImVec2 screenStartPos = PointToScreen(pos, size, Point{ xStartPos, yStartPos });
+    draw->AddCircle(screenStartPos, 5.0f, IM_COL32(255, 0, 255, 255));
+    draw->AddLine(screenStartPos, screenStartPos + ImVec2(cos(startDirRad), -sin(startDirRad)) * 20, IM_COL32(255, 0, 255, 255));
+
+    // Render crawlers
+    if (renderer)
+        renderer->Render(draw, pos, size);
+
+    ImGui::EndChild();
 }
 
 void Interface::NetworkVisualizer()
@@ -320,8 +334,8 @@ void Interface::SimulatorThread()
             RunOneGen();
             simState = SimulatorState::Idle;
             break;
-        case SimulatorState::RunningAtMax:
-            RunAtMax();
+        case SimulatorState::RunningNonstop:
+            RunNonstop();
             break;
         }
     }
@@ -338,15 +352,20 @@ void Interface::RunOneGen()
     sim->NextGeneration();
 }
 
-void Interface::RunAtMax()
+void Interface::RunNonstop()
 {
     using namespace std::chrono_literals;
 
-    while (simState == SimulatorState::RunningAtMax)
+    while (simState == SimulatorState::RunningNonstop)
     {
         sim->Step(crawlDuration);
         sim->NextGeneration();
     }
 
     sim->UpdateBuf();
+}
+
+double Interface::ToRadians(int deg)
+{
+    return deg / 180.0 * std::numbers::pi;
 }

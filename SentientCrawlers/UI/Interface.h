@@ -15,7 +15,7 @@ enum class SimulatorState
 	Idle,
 	RunningOneMinute,
 	RunningOneGen,
-	RunningAtMax
+	RunningNonstop
 };
 
 using Percentiles = std::array<double, 11>;
@@ -41,7 +41,7 @@ protected:
 	// UI state
 	bool open = true;
 	std::unique_ptr<Image> mapImg;
-	int crawlDuration = 300;
+	int crawlDuration = 300, xStartPos = 620, yStartPos = 1030 - 950, startDir = 0;
 	bool showNetworkVisualizer = false;
 
 	// Statistics
@@ -53,8 +53,12 @@ protected:
 	std::unique_ptr<Simulator> sim;
 	volatile SimulatorState simState = SimulatorState::Idle;
 
-	// Render helpers
+	// UI Components
+	void Sidebar();
+	void Canvas();
 	void NetworkVisualizer();
+
+	// Render helpers
 	ImVec2 PointToScreen(ImVec2 canvasPos, ImVec2 canvasSize, Point p);
 	void RenderGraph(ImDrawList* draw, ImVec2 pos, ImVec2 size);
 	void RenderBackdrop(ImDrawList* draw, ImVec2 pos, ImVec2 size);
@@ -65,7 +69,10 @@ protected:
 	void SimulatorThread();
 	void RunOneMinute();
 	void RunOneGen();
-	void RunAtMax();
+	void RunNonstop();
+
+	// General Util
+	static double ToRadians(int deg);
 
 	std::thread simThread;
 };
