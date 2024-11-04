@@ -75,7 +75,7 @@ void Interface::Sidebar()
     // === Simulator Configuration ===
     static int numCrawlers = 100;
     ImGui::Text("Configuration");
-    ImGui::InputInt("Num Crawlers", &numCrawlers);
+    ImGui::InputInt("Num Crawlers", &numCrawlers, 0);
 
     ImGui::SliderInt("X Start Pos", &xStartPos, 0, mapImg->Width());
     ImGui::SliderInt("Y Start Pos", &yStartPos, 0, mapImg->Height());
@@ -172,7 +172,7 @@ void Interface::Canvas()
     // Render start pos
     double startDirRad = ToRadians(startDir);
     ImVec2 screenStartPos = PointToScreen(pos, size, Point{ xStartPos, yStartPos });
-    draw->AddCircle(screenStartPos, 5.0f, IM_COL32(255, 0, 255, 255));
+    draw->AddCircleFilled(screenStartPos, 5.0f, IM_COL32(255, 0, 255, 255));
     draw->AddLine(screenStartPos, screenStartPos + ImVec2(cos(startDirRad), -sin(startDirRad)) * 20, IM_COL32(255, 0, 255, 255));
 
     // Render crawlers
