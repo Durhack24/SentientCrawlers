@@ -89,6 +89,7 @@ void Interface::Sidebar()
         renderer = std::make_unique<TrainingRenderer>(*sim.get(), Point{ mapImg->Width(), mapImg->Height() });
         graphData.points.clear();
         graphData.maxY = -INFINITY;
+        showBestCrawler = false;
     }
 
     // === Run Options ===
@@ -112,7 +113,6 @@ void Interface::Sidebar()
     }
     ImGui::PopID();
 
-    static bool showBestCrawler = false;
     if (ImGui::Checkbox("Show Best Crawler", &showBestCrawler))
     {
         renderer.reset();

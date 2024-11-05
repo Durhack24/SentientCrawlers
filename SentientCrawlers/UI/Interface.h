@@ -42,6 +42,7 @@ protected:
 	bool open = true;
 	std::unique_ptr<Image> mapImg;
 	int crawlDuration = 300, xStartPos = 620, yStartPos = 1030 - 950, startDir = 0;
+    bool showBestCrawler = false;
 	bool showNetworkVisualizer = false;
 
 	// Statistics
