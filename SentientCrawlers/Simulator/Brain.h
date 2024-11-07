@@ -26,7 +26,7 @@ public:
 	static Brain Random();
 	static Brain Mutate(const Brain& parent);
 
-	Layer Think(const Layer& stimuli);
+	std::array<double, NumOutputs> Think(const Layer& stimuli);
 
 	static std::vector<size_t> GetArchitecture();
 	const std::array<Layer, 3>& GetWeights() const;
@@ -36,5 +36,5 @@ protected:
 
     static void InitializeLayer(Layer& layer, size_t size);
     static void MutateLayer(Layer& layer);
-	static void ApplyLayer(Layer& out, const Layer& nodes, const Layer& layer);
+	static void ApplyLayer(double* out, const double* nodes, size_t inputNum, const Layer& weights);
 };

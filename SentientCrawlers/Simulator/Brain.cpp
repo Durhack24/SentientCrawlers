@@ -21,15 +21,15 @@ Brain Brain::Mutate(const Brain& parent)
     return mutated;
 }
 
-Layer Brain::Think(const Layer& stimuli)
+std::array<double, NumOutputs> Brain::Think(const Layer& stimuli)
 {
-    thread_local Layer h0(NumHidden0);
-    thread_local Layer h1(NumHidden1);
-    thread_local Layer output(NumOutputs);
+    std::array<double, NumHidden0> h0;
+    std::array<double, NumHidden1> h1;
+    std::array<double, NumOutputs> output;
 
-    ApplyLayer(h0, stimuli, weights[0]);
-    ApplyLayer(h1, h0, weights[1]);
-    ApplyLayer(output, h1, weights[2]);
+    ApplyLayer(h0.data(), stimuli.data(), stimuli.size(), weights[0]);
+    ApplyLayer(h1.data(), h0.data(), h0.size(), weights[1]);
+    ApplyLayer(output.data(), h1.data(), h1.size(), weights[2]);
 
     return output;
 }
@@ -84,18 +84,18 @@ static inline double activation(double x)
     //return tanh(x);
 }
 
-void Brain::ApplyLayer(Layer& out, const Layer& nodes, const Layer& layer)
+void Brain::ApplyLayer(double* out, const double* nodes, size_t inputNum, const Layer& weights)
 {
-    size_t weightWidth = nodes.size() + 1;
-    size_t weightHeight = layer.size() / weightWidth;
+    size_t weightWidth = inputNum + 1;
+    size_t weightHeight = weights.size() / weightWidth;
 
     for (size_t outIdx = 0; outIdx < weightHeight; outIdx++)
     {
-        double nodeValue = layer[weightWidth * outIdx]; // Start with the bias (weight in the first column)
+        double nodeValue = weights[weightWidth * outIdx]; // Start with the bias (weight in the first column)
 
         // Sum the weights multiplied by node values
         for (size_t inputIdx = 0; inputIdx < weightWidth - 1; inputIdx++)
-            nodeValue += nodes[inputIdx] * layer[weightWidth * outIdx + inputIdx + 1];
+            nodeValue += nodes[inputIdx] * weights[weightWidth * outIdx + inputIdx + 1];
 
         out[outIdx] = activation(nodeValue);
     }
